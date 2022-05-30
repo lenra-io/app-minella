@@ -45,13 +45,15 @@ module.exports = class Player extends LenraData {
      * @param {boolean} flagging If true, the player is adding flags
      * @param {Cell[]} revealedCells The player revealed cells
      * @param {Cell[]} flags The player flags
+     * @param {number} score The player score
      */
-    constructor(_id, _datastore, _refs, _refBy, actions, flagging, revealedCells, flags) {
+    constructor(_id, _datastore, _refs, _refBy, actions, flagging, revealedCells, flags, score) {
         super(_id, _datastore, _refs, _refBy);
         this.actions = actions || [];
         this.flagging = flagging;
         this.revealedCells = revealedCells || [];
         this.flags = flags || [];
+        this.score = score || 0;
     }
 
     static RevealAction = RevealAction;

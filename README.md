@@ -1,18 +1,15 @@
 # Minella
 
-Démineur
+A mineseeper app with multiple game modes and difficulty levels.
 
-Gérer plusieurs niveaux de difficulté.
+## Single player
 
-## Un seul joueur
+The classical minesweeper game.
 
-Démineur classique avec plusieurs niveaux de difficulté
+## Versus
 
-## Deux joueurs
-
-Un joueur bleu un joueur rouge.
-Chaque joueur joue chacun son tour et démarre la partie à Zéro points.
-Quand un joueur découvre une case avec un chiffre, il gagne le nombre de points correspondants au numéro.
-Le drapeau n'est placé que pour le joueur qui le pose.
-Si un joueur trouve une bombe, il perd la partie (ou la partie s'arrête et il perd 20 points par exemple).
-Une fois que toutes les cases sont découvertes (moins celles des bombes) la partie s'arrête et le joueur avec plus de points gagne.
+Two players fighting to get hightest score.
+Each player starts with a score of 0 and win the number of points corresponding of the cells revealed by him.
+The player take tunrs and the flags are personnals.
+If a player reveal a bomb he loose the game (or loose 10 points ?).
+When all the cells are revealed minus the bomb ones the player with highter score wins.
