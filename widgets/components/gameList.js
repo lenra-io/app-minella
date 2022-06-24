@@ -63,7 +63,13 @@ function gameList(games, props) {
  */
 function gameCard(players, props) {
     const currentPlayer = players[0];
-    console.log("gameCard", currentPlayer, JSON.stringify(props));
+    var difficulty = props.game.difficulty;
+    var finished = (props.game.finished)?"Finished !":"Continue game !";
+    var date = new Date(props.game.lastPlayDate);
+    var dateformat = date.getDate() + "/" + date.getMonth() + "/" + date.getFullYear() + " at " + date.getHours() + ":" + date.getMinutes();
+    var numberOfPlayer = props.game.playerNumber;
+    var playerMode = (numberOfPlayer == 1) ? "solo mode" : "multiplayer mode";
+    var descriptionText = "Last played on " + dateformat + ", in " + playerMode+"\n"+finished;
     return {
         type: "actionable",
         child: {
@@ -109,7 +115,7 @@ function gameCard(players, props) {
                                 fontSize: 16,
                                 fontWeight: "w900"
                             },
-                            value: 'Easy'
+                            value: (difficulty == 0) ? 'Easy' : ((difficulty == 1) ? 'Medium' : 'Hard')
                         }]
                     },
                     {
@@ -119,11 +125,11 @@ function gameCard(players, props) {
                         fillParent: true,
                         children: [{
                             type: "text",
-                            value: "-"
+                            value: descriptionText
                         },
                         {
                             type: "text",
-                            value: 'Easy'
+                            value: (difficulty == 0) ? 'Easy' : ((difficulty == 1) ? 'Medium' : 'Hard')
                         }]
                     }
                 ]
