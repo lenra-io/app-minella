@@ -137,6 +137,9 @@ async function revealCell(props, event, api) {
   await playerService.updatePlayer(api, currentPlayer);
   game.lastPlayer = props.player;
   game.lastPlayDate = Date.now();
+  if (game.startPlayDate === undefined) {
+    game.startPlayDate = Date.now();
+  }
   if (isBomb) {
     // TODO: handle multiplayer system
     console.log("Found bomb", game, currentPlayer);
