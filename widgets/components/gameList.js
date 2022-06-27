@@ -62,8 +62,6 @@ function gameList(games, props) {
  * @returns 
  */
 function gameCard(players, props) {
-    console.log("__________________PROPS_________________")
-    console.log(props)
     const currentPlayer = players[0];
     var difficulty = props.game.difficulty;
     var finished = (props.game.finished) ? "Finished !" : "Continue game !";
