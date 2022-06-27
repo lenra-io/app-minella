@@ -154,7 +154,7 @@ async function revealCell(props, event, api) {
       if (game.playerNumber > 1) {
         game.winner = players[0].score > players[1].score ? players[0]._id : players[1]._id;
       }
-      else  game.winner = currentPlayer._id;
+      else game.winner = currentPlayer._id;
     }
   }
   await gameService.updateGame(api, game);
@@ -195,12 +195,10 @@ async function toggleFlag(props, event, api) {
   const player = await playerService.getPlayer(api, props.player);
   const cell = new Cell(props.x, props.y);
   const pos = player.flags
-    .findIndex(a => cell.equals(a.cell));
+    .findIndex(a =>cell.equals(a));
   const action = new Player.FlagAction(Date.now(), cell, pos == -1);
-
   if (pos == -1) player.flags.push(cell);
   else player.flags.splice(pos, 1);
-
   player.actions.push(action);
   return playerService.updatePlayer(api, player);
 }
