@@ -65,12 +65,17 @@ function gameCard(players, props) {
     const currentPlayer = players[0];
     var difficulty = props.game.difficulty;
     var finished = (props.game.finished) ? "Finished !" : "Continue game !";
+
     var date = new Date(props.game.lastPlayDate);
-    var dateformat = date.getDate() + "/" + date.getMonth() + "/" + date.getFullYear() + " at " + date.getHours() + ":" + date.getMinutes();
+    var day = (String(date.getDate()).length == 1) ? "0" + String(date.getDate()) : String(date.getDate());
+    var month = (String(date.getMonth()).length == 1) ? "0" + String(date.getMonth()) : String(date.getMonth());
+    var hours = (String(date.getHours()).length == 1) ? "0" + String(date.getHours()) : String(date.getHours());
+    var minutes = (String(date.getMinutes()).length == 1) ? "0" + String(date.getMinutes()) : String(date.getMinutes());
+    var dateformat = day + "/" + month + "/" + date.getFullYear() + " at " + hours + ":" + minutes;
+
     var numberOfPlayer = props.game.playerNumber;
     var playerMode = (numberOfPlayer == 1) ? "solo mode" : "multiplayer mode";
     var descriptionText = (isNaN(date)) ? "Not started yet !" : "Last played on " + dateformat + ", in " + playerMode + "\n" + finished;
-
     return {
         type: "actionable",
         child: {
