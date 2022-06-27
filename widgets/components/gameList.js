@@ -65,6 +65,7 @@ function gameCard(players, props) {
     const currentPlayer = players[0];
     var difficulty = props.game.difficulty;
     var finished = (props.game.finished) ? "Finished !" : "Continue game !";
+
     var date = new Date(props.game.lastPlayDate);
     var day = (String(date.getDate()).length == 1) ? "0" + String(date.getDate()) : String(date.getDate());
     var month = (String(date.getMonth()).length == 1) ? "0" + String(date.getMonth()) : String(date.getMonth());
