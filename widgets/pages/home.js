@@ -7,9 +7,6 @@ const { flag } = require('../utils/icons.js');
  * @returns 
  */
 function content(_data, props) {
-    console.log("PROPS TO CALL CARDS VIEW");
-    console.log(props);
-
     return {
         type: "widget",
         name: "gameList",
