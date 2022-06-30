@@ -236,10 +236,16 @@ async function toggleFlag(props, event, api) {
   const cell = new Cell(props.x, props.y);
   const pos = player.flags
     .findIndex(a => cell.equals(a));
-  const action = new Player.FlagAction(Date.now(), cell, pos == -1);
-  if (pos == -1) player.flags.push(cell);
-  else player.flags.splice(pos, 1);
-  player.actions.push(action);
+  var game = await gameService.getGame(api, props.game);
+  var numOfMaxflags = (game.difficulty == 0) ? 10 : ((game.difficulty == 1) ? 40 : 99);
+
+  if (player.flags.length + 1 <= numOfMaxflags) {
+    const action = new Player.FlagAction(Date.now(), cell, pos == -1);
+    if (pos == -1) player.flags.push(cell);
+    else player.flags.splice(pos, 1);
+    player.actions.push(action);
+  }
+
   return playerService.updatePlayer(api, player);
 }
 
