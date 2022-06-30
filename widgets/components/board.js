@@ -14,23 +14,29 @@ function board(boards, props) {
   const board = boards[0];
 
   return {
-    type: "widget",
-    name: "boardPlayers",
-    query: {
-      "$find": {
-        "_datastore": playerService.datastoreName,
-        "_refs": {
-          "$contains": props.game
+    type: "flex",
+    scroll: true,
+    children: [
+      {
+        type: "widget",
+        name: "boardPlayers",
+        query: {
+          "$find": {
+            "_datastore": playerService.datastoreName,
+            "_refs": {
+              "$contains": props.game
+            }
+          }
+        },
+        props: {
+          game: props.game,
+          board: board._id,
+          cells: board.cells,
+          player: props.player,
+          myTurn: props.myTurn
         }
       }
-    },
-    props: {
-      game: props.game,
-      board: board._id,
-      cells: board.cells,
-      player: props.player,
-      myTurn: props.myTurn
-    }
+    ]
   }
 }
 
@@ -49,7 +55,7 @@ function boardPlayers(players, props) {
       type: "flex",
       direction: "horizontal",
       children: cells.map((value, x) => {
-        const revealed = players.some(p => p.revealedCells.some(c => c.x==x && c.y==y)),
+        const revealed = players.some(p => p.revealedCells.some(c => c.x == x && c.y == y)),
           flagged = currentPlayer.flags.find(c => c.x == x && c.y == y);
 
         const pressable = !revealed && (currentPlayer.flagging || !flagged && props.myTurn);
@@ -62,7 +68,7 @@ function boardPlayers(players, props) {
             width: pressable ? 2 : 1
           }),
           decoration: {
-            color: !revealed ? ui.color.grey : (flagged || currentPlayer.revealedCells.some(c => c.x==x && c.y==y) ? ui.color.blue : ui.color.red)
+            color: !revealed ? ui.color.grey : (flagged || currentPlayer.revealedCells.some(c => c.x == x && c.y == y) ? ui.color.blue : ui.color.red)
           },
           child: {
             type: "flex",
