@@ -18,6 +18,9 @@ function content(_data, props) {
                 },
                 // "finished": false
             }
+        },
+        props: {
+            userData: props.user
         }
     }
 }

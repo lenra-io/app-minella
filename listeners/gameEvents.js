@@ -13,6 +13,43 @@ const boardService = require('../services/boardService.js');
 const Cell = require('../classes/Cell.js');
 
 
+
+/**
+ * apply filters
+ * @param {*} props
+ * @param {*} event
+ * @param {*} api
+ * @returns 
+ */
+async function applyFilter(props, event, api) {
+  const userData = await userService.getUser(api);
+  if (props.buttonType == "playTime") {
+    userData.filters["startTime"] = "None";
+  } else if (props.buttonType == "startTime") {
+    userData.filters["playTime"] = "None";
+  }
+  userData.filters[props.buttonType] = props.value;
+  await userService.updateUser(api, userData);
+}
+
+/**
+ * reset filters
+ * @param {*} props
+ * @param {*} event
+ * @param {*} api
+ * @returns 
+ */
+async function resetFilters(props, event, api) {
+  const userData = await userService.getUser(api);
+  userData.filters.difficulty = "All";
+  userData.filters.gameState = "All";
+  userData.filters.playTime = "None";
+  userData.filters.result = "All";
+  userData.filters.startTime = "None";
+  userData.filters[props.buttonType] = props.value;
+  await userService.updateUser(api, userData);
+}
+
 /**
  * Creates a category
  * @param {*} props
@@ -198,7 +235,7 @@ async function toggleFlag(props, event, api) {
   const player = await playerService.getPlayer(api, props.player);
   const cell = new Cell(props.x, props.y);
   const pos = player.flags
-    .findIndex(a =>cell.equals(a));
+    .findIndex(a => cell.equals(a));
   const action = new Player.FlagAction(Date.now(), cell, pos == -1);
   if (pos == -1) player.flags.push(cell);
   else player.flags.splice(pos, 1);
@@ -224,5 +261,7 @@ module.exports = {
   createGame,
   revealCell,
   toggleFlag,
-  toggleFlagging
+  toggleFlagging,
+  applyFilter,
+  resetFilters
 }
