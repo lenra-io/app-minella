@@ -237,7 +237,6 @@ async function toggleFlag(props, event, api) {
   const pos = player.flags
     .findIndex(a => cell.equals(a));
   var game = await gameService.getGame(api, props.game);
-  console.log(game);
   var numOfMaxflags = (game.difficulty == 0) ? 10 : ((game.difficulty == 1) ? 40 : 99);
 
   if (player.flags.length + 1 <= numOfMaxflags) {
