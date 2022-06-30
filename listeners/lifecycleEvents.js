@@ -21,7 +21,7 @@ function onEnvStop(props, event, api) {
 
 async function onUserFirstJoin(props, event, api) {
     var userData =await userService.getUser(api, userData);
-    userData.filters = { gameState: "All", result: "All", difficulty: "All", playTime: "Asc", startTime: "Asc" };
+    userData.filters = { gameState: "All", result: "All", difficulty: "All", playTime: "None", startTime: "None" };
     await userService.updateUser(api, userData);
     return navigationService.home(api);
 }

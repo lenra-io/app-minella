@@ -12,8 +12,8 @@ const ui = require('../utils/ui.js');
  */
 function gameList(games, props) {
     var filters = props.userData.filters;
-    var startTimeAsc = (filters.startTime == "Asc");
-    var playTimeAsc = (filters.playTime == "Asc");
+    var startTimeNone = (filters.startTime == "None");
+    var playTimeNone = (filters.playTime == "None");
     var difficultyAll = (filters.difficulty == "All");
     var gameStateAll = (filters.gameState == "All");
     var resultAll = (filters.result == "All");
@@ -52,22 +52,19 @@ function gameList(games, props) {
         if (filters.gameState == "Winned") {
             resultFilter = gameStateFilter.filter(game => resultDir[filters.result] == (game.winner == undefined));
         } else {
-            resultFilter = gameStateFilter.filter(game => resultDir[filters.result] == (game.winner != undefined));
+            resultFilter = gameStateFilter.filter(game => resultDir[filters.result] == (game.winner != undefined) && game.finished);
         }
     }
-    // var startTimeFilter = resultFilter;
-    // if (startTimeAsc) {
-    //     startTimeFilter = resultFilter.sort((a, b) => b.lastMoveDate - a.lastMoveDate);
-    // } else {
-    //     startTimeFilter = resultFilter.sort((a, b) => a.lastMoveDate - b.lastMoveDate);
-    // }
-    var playTimeFilter = resultFilter;
-    if (playTimeAsc) {
-        playTimeFilter = resultFilter.sort((a, b) => b.lastPlayDate - a.lastPlayDate);
-    } else {
-        playTimeFilter = resultFilter.sort((a, b) => a.lastPlayDate - b.lastPlayDate);
+
+    var startTimeFilter = resultFilter;
+    if (!startTimeNone) {
+        startTimeFilter = (filters.startTime == "Asc") ? resultFilter.sort((a, b) => a.startPlayDate - b.startPlayDate) : resultFilter.sort((a, b) => b.startPlayDate - a.startPlayDate);
     }
 
+    var playTimeFilter = startTimeFilter;
+    if (!playTimeNone) {
+        playTimeFilter = (filters.playTime == "Asc") ? startTimeFilter.sort((a, b) => (a.lastPlayDate - a.startPlayDate) - (b.lastPlayDate - b.startPlayDate)) : startTimeFilter.sort((a, b) => (b.lastPlayDate - b.startPlayDate) - (a.lastPlayDate - a.startPlayDate));
+    }
     return {
         type: "container",
         constraints: {
@@ -77,15 +74,14 @@ function gameList(games, props) {
             type: "flex",
             spacing: 3,
             direction: "vertical",
-            // fillParent: props.fillParent,
-            // crossAxisAlignment: props.crossAxisAlignment,
             padding: {
                 bottom: 4
             },
             children: [
                 {
                     type: "flex",
-                    // direction: "vertical",
+                    fillParent: true,
+                    mainAxisAlignment: "spaceBetween",
                     children: [
                         {
                             type: "flex",
@@ -104,53 +100,51 @@ function gameList(games, props) {
                                             child: {
                                                 type: "menu",
                                                 children: [
-                                                    // buttons to place here
                                                     {
-                                                        type: "button",
-                                                        text: "Finished",
-                                                        onPressed: {
-                                                            action: "applyFilter",
-                                                            props: {
-                                                                buttonType: "gameState",
-                                                                value: "Finished"
-                                                            }
-                                                        }
-                                                    },
-                                                    {
-                                                        type: "button",
-                                                        text: "Not Finished",
-                                                        onPressed: {
-                                                            action: "applyFilter",
-                                                            props: {
-                                                                buttonType: "gameState",
-                                                                value: "Not Finished"
-                                                            }
-                                                        }
-                                                    },
-                                                    {
-                                                        type: "button",
-                                                        text: "Not Started",
-                                                        onPressed: {
-                                                            action: "applyFilter",
-                                                            props: {
-                                                                buttonType: "gameState",
-                                                                value: "Not Started"
-                                                            }
-                                                        }
-                                                    },
-                                                    {
-                                                        type: "button",
-                                                        text: "All",
-                                                        onPressed: {
-                                                            action: "applyFilter",
-                                                            props: {
-                                                                buttonType: "gameState",
-                                                                value: "All"
-                                                            }
-                                                        }
+                                                        type: "flex",
+                                                        direction: "vertical",
+                                                        crossAxisAlignment: "stretch",
+                                                        children: [
+                                                            {
+                                                                type: "widget",
+                                                                name: "filterButton",
+                                                                props: {
+                                                                    buttonType: "gameState",
+                                                                    buttonValue: "Finished",
+                                                                    buttonText: "Finished"
+                                                                }
+                                                            },
+                                                            {
+                                                                type: "widget",
+                                                                name: "filterButton",
+                                                                props: {
+                                                                    buttonType: "gameState",
+                                                                    buttonValue: "Not Started",
+                                                                    buttonText: "Not Started"
+                                                                }
+                                                            },
+                                                            {
+                                                                type: "widget",
+                                                                name: "filterButton",
+                                                                props: {
+                                                                    buttonType: "gameState",
+                                                                    buttonValue: "Not Finished",
+                                                                    buttonText: "Not Finished"
+                                                                }
+                                                            },
+                                                            {
+                                                                type: "widget",
+                                                                name: "filterButton",
+                                                                props: {
+                                                                    buttonType: "gameState",
+                                                                    buttonValue: "All",
+                                                                    buttonText: "All"
+                                                                }
+                                                            },
+                                                        ]
                                                     },
                                                 ]
-                                            },
+                                            }
                                         }
                                     ]
                                 }
@@ -173,62 +167,51 @@ function gameList(games, props) {
                                             child: {
                                                 type: "menu",
                                                 children: [
-                                                    // buttons to place here
                                                     {
-                                                        type: "widget",
-                                                        name: "filterButton",
-                                                        props: {
-                                                            buttonType: "difficulty",
-                                                            buttonValue: "Easy",
-                                                            buttonText: "Easy"
-                                                        }
-                                                    }, {
-                                                        type: "button",
-                                                        text: "Easy",
-                                                        onPressed: {
-                                                            action: "applyFilter",
-                                                            props: {
-                                                                buttonType: "difficulty",
-                                                                value: "Easy"
+                                                        type: "flex",
+                                                        direction: "vertical",
+                                                        crossAxisAlignment: "stretch",
+                                                        children: [
+                                                            {
+                                                                type: "widget",
+                                                                name: "filterButton",
+                                                                props: {
+                                                                    buttonType: "difficulty",
+                                                                    buttonValue: "Easy",
+                                                                    buttonText: "Easy"
+                                                                }
                                                             }
-                                                        }
-                                                    },
-
-                                                    {
-                                                        type: "button",
-                                                        text: "Medium",
-                                                        onPressed: {
-                                                            action: "applyFilter",
-                                                            props: {
-                                                                buttonType: "difficulty",
-                                                                value: "Medium"
+                                                            , {
+                                                                type: "widget",
+                                                                name: "filterButton",
+                                                                props: {
+                                                                    buttonType: "difficulty",
+                                                                    buttonValue: "Medium",
+                                                                    buttonText: "Medium"
+                                                                }
                                                             }
-                                                        }
-                                                    },
-                                                    {
-                                                        type: "button",
-                                                        text: "Hard",
-                                                        onPressed: {
-                                                            action: "applyFilter",
-                                                            props: {
-                                                                buttonType: "difficulty",
-                                                                value: "Hard"
+                                                            , {
+                                                                type: "widget",
+                                                                name: "filterButton",
+                                                                props: {
+                                                                    buttonType: "difficulty",
+                                                                    buttonValue: "Hard",
+                                                                    buttonText: "Hard"
+                                                                }
                                                             }
-                                                        }
-                                                    },
-                                                    {
-                                                        type: "button",
-                                                        text: "All",
-                                                        onPressed: {
-                                                            action: "applyFilter",
-                                                            props: {
-                                                                buttonType: "difficulty",
-                                                                value: "All"
+                                                            , {
+                                                                type: "widget",
+                                                                name: "filterButton",
+                                                                props: {
+                                                                    buttonType: "difficulty",
+                                                                    buttonValue: "All",
+                                                                    buttonText: "All"
+                                                                }
                                                             }
-                                                        }
+                                                        ]
                                                     },
                                                 ]
-                                            },
+                                            }
                                         }
                                     ]
                                 }
@@ -251,42 +234,42 @@ function gameList(games, props) {
                                             child: {
                                                 type: "menu",
                                                 children: [
-                                                    // buttons to place here
                                                     {
-                                                        type: "button",
-                                                        text: "Winned",
-                                                        onPressed: {
-                                                            action: "applyFilter",
-                                                            props: {
-                                                                buttonType: "result",
-                                                                value: "Winned"
-                                                            }
-                                                        }
-                                                    },
-                                                    {
-                                                        type: "button",
-                                                        text: "Loosed",
-                                                        onPressed: {
-                                                            action: "applyFilter",
-                                                            props: {
-                                                                buttonType: "result",
-                                                                value: "Loosed"
-                                                            }
-                                                        }
-                                                    },
-                                                    {
-                                                        type: "button",
-                                                        text: "All",
-                                                        onPressed: {
-                                                            action: "applyFilter",
-                                                            props: {
-                                                                buttonType: "result",
-                                                                value: "All"
-                                                            }
-                                                        }
+                                                        type: "flex",
+                                                        direction: "vertical",
+                                                        crossAxisAlignment: "stretch",
+                                                        children: [
+                                                            {
+                                                                type: "widget",
+                                                                name: "filterButton",
+                                                                props: {
+                                                                    buttonType: "result",
+                                                                    buttonValue: "Winned",
+                                                                    buttonText: "Winned"
+                                                                }
+                                                            },
+                                                            {
+                                                                type: "widget",
+                                                                name: "filterButton",
+                                                                props: {
+                                                                    buttonType: "result",
+                                                                    buttonValue: "Loosed",
+                                                                    buttonText: "Loosed"
+                                                                }
+                                                            },
+                                                            {
+                                                                type: "widget",
+                                                                name: "filterButton",
+                                                                props: {
+                                                                    buttonType: "result",
+                                                                    buttonValue: "All",
+                                                                    buttonText: "All"
+                                                                }
+                                                            },
+                                                        ]
                                                     },
                                                 ]
-                                            },
+                                            }
                                         }
                                     ]
                                 }
@@ -309,31 +292,42 @@ function gameList(games, props) {
                                             child: {
                                                 type: "menu",
                                                 children: [
-                                                    // buttons to place here
                                                     {
-                                                        type: "button",
-                                                        text: "Asc",
-                                                        onPressed: {
-                                                            action: "applyFilter",
-                                                            props: {
-                                                                buttonType: "playTime",
-                                                                value: "Asc"
-                                                            }
-                                                        }
-                                                    },
-                                                    {
-                                                        type: "button",
-                                                        text: "Desc",
-                                                        onPressed: {
-                                                            action: "applyFilter",
-                                                            props: {
-                                                                buttonType: "playTime",
-                                                                value: "Desc"
-                                                            }
-                                                        }
+                                                        type: "flex",
+                                                        direction: "vertical",
+                                                        crossAxisAlignment: "stretch",
+                                                        children: [
+                                                            {
+                                                                type: "widget",
+                                                                name: "filterButton",
+                                                                props: {
+                                                                    buttonType: "playTime",
+                                                                    buttonValue: "Asc",
+                                                                    buttonText: "Asc"
+                                                                }
+                                                            },
+                                                            {
+                                                                type: "widget",
+                                                                name: "filterButton",
+                                                                props: {
+                                                                    buttonType: "playTime",
+                                                                    buttonValue: "Desc",
+                                                                    buttonText: "Desc"
+                                                                }
+                                                            },
+                                                            {
+                                                                type: "widget",
+                                                                name: "filterButton",
+                                                                props: {
+                                                                    buttonType: "playTime",
+                                                                    buttonValue: "None",
+                                                                    buttonText: "None"
+                                                                }
+                                                            },
+                                                        ]
                                                     },
                                                 ]
-                                            },
+                                            }
                                         }
                                     ]
                                 }
@@ -356,36 +350,54 @@ function gameList(games, props) {
                                             child: {
                                                 type: "menu",
                                                 children: [
-                                                    // buttons to place here
                                                     {
-                                                        type: "button",
-                                                        text: "Asc",
-                                                        onPressed: {
-                                                            action: "applyFilter",
-                                                            props: {
-                                                                buttonType: "startTime",
-                                                                value: "Asc"
-                                                            }
-                                                        }
-                                                    },
-                                                    {
-                                                        type: "button",
-                                                        text: "Desc",
-                                                        onPressed: {
-                                                            action: "applyFilter",
-                                                            props: {
-                                                                buttonType: "startTime",
-                                                                value: "Desc"
-                                                            }
-                                                        }
+                                                        type: "flex",
+                                                        direction: "vertical",
+                                                        crossAxisAlignment: "stretch",
+                                                        children: [
+                                                            {
+                                                                type: "widget",
+                                                                name: "filterButton",
+                                                                props: {
+                                                                    buttonType: "startTime",
+                                                                    buttonValue: "Asc",
+                                                                    buttonText: "Asc"
+                                                                }
+                                                            },
+                                                            {
+                                                                type: "widget",
+                                                                name: "filterButton",
+                                                                props: {
+                                                                    buttonType: "startTime",
+                                                                    buttonValue: "Desc",
+                                                                    buttonText: "Desc"
+                                                                }
+                                                            },
+                                                            {
+                                                                type: "widget",
+                                                                name: "filterButton",
+                                                                props: {
+                                                                    buttonType: "startTime",
+                                                                    buttonValue: "None",
+                                                                    buttonText: "None"
+                                                                }
+                                                            },
+                                                        ]
                                                     },
                                                 ]
-                                            },
+                                            }
                                         }
                                     ]
                                 }
                             ]
                         },
+                        {
+                            type: "button",
+                            text: "Reset filters",
+                            onPressed: {
+                                action:"resetFilters"
+                            }
+                        }
                     ]
                 }
                 , ...playTimeFilter
@@ -431,7 +443,8 @@ function getProperTime(time) {
 function gameCard(players, props) {
     const currentPlayer = players[0];
     var difficulty = props.game.difficulty;
-    var finished = (props.game.finished) ? "Finished !" : "Continue game !";
+    var finished = (props.game.finished) ? "Finished" : "Continue game";
+    var result = (props.game.finished && props.game.winner != undefined) ? "with a win" : ((props.game.finished && props.game.winner == undefined) ? "with a loose" : "");
     var date = new Date(props.game.lastPlayDate);
     var day = getProperTime(date.getDate());
     var month = getProperTime(date.getMonth());
@@ -443,7 +456,7 @@ function gameCard(players, props) {
 
     var numberOfPlayer = props.game.playerNumber;
     var playerMode = (numberOfPlayer == 1) ? "solo mode" : "multiplayer mode";
-    var descriptionText = (isNaN(date)) ? "Not started yet !" : "Last played on " + dateformat + ", in " + playerMode + "\n" + finished + " With " + getProperTime(duration.getHours()) + ":" + getProperTime(duration.getMinutes()) + ":" + getProperTime(duration.getSeconds()) + " of play time.";
+    var descriptionText = (isNaN(date)) ? "Not started yet !" : "Played on " + dateformat + "\nWith " + getProperTime(duration.getHours()) + ":" + getProperTime(duration.getMinutes()) + ":" + getProperTime(duration.getSeconds()) + " of play time.";
     return {
         type: "actionable",
         child: {
@@ -489,7 +502,7 @@ function gameCard(players, props) {
                                 fontSize: 16,
                                 fontWeight: "w900"
                             },
-                            value: (difficulty == 0) ? 'Easy' : ((difficulty == 1) ? 'Medium' : 'Hard')
+                            value: finished + " " + result + " in " + playerMode + " !"
                         }]
                     },
                     {
@@ -520,14 +533,7 @@ function gameCard(players, props) {
     };
 }
 
-
-/**
- * 
- * @param {Player[]} players 
- * @param {{game: Game}} props
- * @returns 
- */
-function filterButton(props) {
+function filterButton(players, props) {
     return {
         type: "actionable",
         onPressed: {
@@ -545,17 +551,13 @@ function filterButton(props) {
             child: {
                 type: "flex",
                 children: [
-                    // {
-                    //     type: "icon",
-                    //     value: props.icon,
-                    //     color: 0xFFFFFFFF,
-                    //     size: 25
-                    // },
                     {
                         type: "container",
                         padding: {
                             top: 1,
                             left: 1,
+                            right: 1,
+                            bottom: 1,
                         },
                         child: {
                             type: "text",
@@ -570,6 +572,7 @@ function filterButton(props) {
         }
     }
 }
+
 
 
 module.exports = {
