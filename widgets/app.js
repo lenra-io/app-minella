@@ -34,7 +34,8 @@ module.exports = (users, _props) => {
         type: "widget",
         name: `${user.navigation.state.page}_content`,
         props: {
-          state: user.navigation.state
+          state: user.navigation.state,
+          user: user
         }
       }
     ]

@@ -11,6 +11,63 @@ const ui = require('../utils/ui.js');
  * @returns 
  */
 function gameList(games, props) {
+    var filters = props.userData.filters;
+    var startTimeAsc = (filters.startTime == "Asc");
+    var playTimeAsc = (filters.playTime == "Asc");
+    var difficultyAll = (filters.difficulty == "All");
+    var gameStateAll = (filters.gameState == "All");
+    var resultAll = (filters.result == "All");
+    var difficultyFilter = games;
+    if (!difficultyAll) {
+        var difficultDir = {
+            0: "Easy",
+            1: "Medium",
+            2: "Hard",
+        }
+        difficultyFilter = games.filter(game => difficultDir[game.difficulty] == filters.difficulty);
+    }
+
+    var gameStateFilter = difficultyFilter;
+    if (!gameStateAll) {
+        var gameStateDir = {
+            "Finished": true,
+            "Not Finished": undefined,
+            "Not Started": undefined,
+        }
+        if (filters.gameState == "Finished") {
+            gameStateFilter = difficultyFilter.filter(game => gameStateDir[filters.gameState] == game.finished);
+        } else if (filters.gameState == "Not Started") {
+            gameStateFilter = difficultyFilter.filter(game => gameStateDir[filters.gameState] == game.finished && game.lastPlayDate == undefined);
+        } else {
+            gameStateFilter = difficultyFilter.filter(game => gameStateDir[filters.gameState] == game.finished && game.lastPlayDate != undefined);
+        }
+    }
+
+    var resultFilter = gameStateFilter;
+    if (!resultAll) {
+        var resultDir = {
+            "Winned": true,
+            "Loosed": false
+        }
+        if (filters.gameState == "Winned") {
+            resultFilter = gameStateFilter.filter(game => resultDir[filters.result] == (game.winner == undefined));
+        } else {
+            resultFilter = gameStateFilter.filter(game => resultDir[filters.result] == (game.winner != undefined));
+        }
+    }
+    // var startTimeFilter = resultFilter;
+    // if (startTimeAsc) {
+    //     startTimeFilter = resultFilter.sort((a, b) => b.lastMoveDate - a.lastMoveDate);
+    // } else {
+    //     startTimeFilter = resultFilter.sort((a, b) => a.lastMoveDate - b.lastMoveDate);
+    // }
+    var playTimeFilter = resultFilter;
+    if (playTimeAsc) {
+        playTimeFilter = resultFilter.sort((a, b) => b.lastPlayDate - a.lastPlayDate);
+    } else {
+        playTimeFilter = resultFilter.sort((a, b) => a.lastPlayDate - b.lastPlayDate);
+    }
+
     return {
         type: "container",
         constraints: {
@@ -25,32 +82,338 @@ function gameList(games, props) {
             padding: {
                 bottom: 4
             },
-            children: games
-                .sort((a, b) => b.lastMoveDate - a.lastMoveDate)
-                .map(game => {
-                    return {
-                        type: "widget",
-                        name: "gameCard",
-                        query: {
-                            "$find": {
-                                "_datastore": playerService.datastoreName,
-                                "_refs": {
-                                    "$and": [
+            children: [
+                {
+                    type: "flex",
+                    // direction: "vertical",
+                    children: [
+                        {
+                            type: "flex",
+                            direction: "vertical",
+                            children: [
+                                {
+                                    type: "text",
+                                    value: "Game state :"
+                                },
+                                {
+                                    type: "flex",
+                                    children: [
                                         {
-                                            "$contains": game._id
-                                        },
-                                        {
-                                            "$contains": "@me"
+                                            type: "dropdownButton",
+                                            text: filters.gameState,
+                                            child: {
+                                                type: "menu",
+                                                children: [
+                                                    // buttons to place here
+                                                    {
+                                                        type: "button",
+                                                        text: "Finished",
+                                                        onPressed: {
+                                                            action: "applyFilter",
+                                                            props: {
+                                                                buttonType: "gameState",
+                                                                value: "Finished"
+                                                            }
+                                                        }
+                                                    },
+                                                    {
+                                                        type: "button",
+                                                        text: "Not Finished",
+                                                        onPressed: {
+                                                            action: "applyFilter",
+                                                            props: {
+                                                                buttonType: "gameState",
+                                                                value: "Not Finished"
+                                                            }
+                                                        }
+                                                    },
+                                                    {
+                                                        type: "button",
+                                                        text: "Not Started",
+                                                        onPressed: {
+                                                            action: "applyFilter",
+                                                            props: {
+                                                                buttonType: "gameState",
+                                                                value: "Not Started"
+                                                            }
+                                                        }
+                                                    },
+                                                    {
+                                                        type: "button",
+                                                        text: "All",
+                                                        onPressed: {
+                                                            action: "applyFilter",
+                                                            props: {
+                                                                buttonType: "gameState",
+                                                                value: "All"
+                                                            }
+                                                        }
+                                                    },
+                                                ]
+                                            },
                                         }
                                     ]
                                 }
-                            }
+                            ]
                         },
-                        props: {
-                            game
+                        {
+                            type: "flex",
+                            direction: "vertical",
+                            children: [
+                                {
+                                    type: "text",
+                                    value: "Difficulty :"
+                                },
+                                {
+                                    type: "flex",
+                                    children: [
+                                        {
+                                            type: "dropdownButton",
+                                            text: filters.difficulty,
+                                            child: {
+                                                type: "menu",
+                                                children: [
+                                                    // buttons to place here
+                                                    {
+                                                        type: "widget",
+                                                        name: "filterButton",
+                                                        props: {
+                                                            buttonType: "difficulty",
+                                                            buttonValue: "Easy",
+                                                            buttonText: "Easy"
+                                                        }
+                                                    }, {
+                                                        type: "button",
+                                                        text: "Easy",
+                                                        onPressed: {
+                                                            action: "applyFilter",
+                                                            props: {
+                                                                buttonType: "difficulty",
+                                                                value: "Easy"
+                                                            }
+                                                        }
+                                                    },
+
+                                                    {
+                                                        type: "button",
+                                                        text: "Medium",
+                                                        onPressed: {
+                                                            action: "applyFilter",
+                                                            props: {
+                                                                buttonType: "difficulty",
+                                                                value: "Medium"
+                                                            }
+                                                        }
+                                                    },
+                                                    {
+                                                        type: "button",
+                                                        text: "Hard",
+                                                        onPressed: {
+                                                            action: "applyFilter",
+                                                            props: {
+                                                                buttonType: "difficulty",
+                                                                value: "Hard"
+                                                            }
+                                                        }
+                                                    },
+                                                    {
+                                                        type: "button",
+                                                        text: "All",
+                                                        onPressed: {
+                                                            action: "applyFilter",
+                                                            props: {
+                                                                buttonType: "difficulty",
+                                                                value: "All"
+                                                            }
+                                                        }
+                                                    },
+                                                ]
+                                            },
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            type: "flex",
+                            direction: "vertical",
+                            children: [
+                                {
+                                    type: "text",
+                                    value: "Result :"
+                                },
+                                {
+                                    type: "flex",
+                                    children: [
+                                        {
+                                            type: "dropdownButton",
+                                            text: filters.result,
+                                            child: {
+                                                type: "menu",
+                                                children: [
+                                                    // buttons to place here
+                                                    {
+                                                        type: "button",
+                                                        text: "Winned",
+                                                        onPressed: {
+                                                            action: "applyFilter",
+                                                            props: {
+                                                                buttonType: "result",
+                                                                value: "Winned"
+                                                            }
+                                                        }
+                                                    },
+                                                    {
+                                                        type: "button",
+                                                        text: "Loosed",
+                                                        onPressed: {
+                                                            action: "applyFilter",
+                                                            props: {
+                                                                buttonType: "result",
+                                                                value: "Loosed"
+                                                            }
+                                                        }
+                                                    },
+                                                    {
+                                                        type: "button",
+                                                        text: "All",
+                                                        onPressed: {
+                                                            action: "applyFilter",
+                                                            props: {
+                                                                buttonType: "result",
+                                                                value: "All"
+                                                            }
+                                                        }
+                                                    },
+                                                ]
+                                            },
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            type: "flex",
+                            direction: "vertical",
+                            children: [
+                                {
+                                    type: "text",
+                                    value: "Play Time :"
+                                },
+                                {
+                                    type: "flex",
+                                    children: [
+                                        {
+                                            type: "dropdownButton",
+                                            text: filters.playTime,
+                                            child: {
+                                                type: "menu",
+                                                children: [
+                                                    // buttons to place here
+                                                    {
+                                                        type: "button",
+                                                        text: "Asc",
+                                                        onPressed: {
+                                                            action: "applyFilter",
+                                                            props: {
+                                                                buttonType: "playTime",
+                                                                value: "Asc"
+                                                            }
+                                                        }
+                                                    },
+                                                    {
+                                                        type: "button",
+                                                        text: "Desc",
+                                                        onPressed: {
+                                                            action: "applyFilter",
+                                                            props: {
+                                                                buttonType: "playTime",
+                                                                value: "Desc"
+                                                            }
+                                                        }
+                                                    },
+                                                ]
+                                            },
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            type: "flex",
+                            direction: "vertical",
+                            children: [
+                                {
+                                    type: "text",
+                                    value: "Start Time :"
+                                },
+                                {
+                                    type: "flex",
+                                    children: [
+                                        {
+                                            type: "dropdownButton",
+                                            text: filters.startTime,
+                                            child: {
+                                                type: "menu",
+                                                children: [
+                                                    // buttons to place here
+                                                    {
+                                                        type: "button",
+                                                        text: "Asc",
+                                                        onPressed: {
+                                                            action: "applyFilter",
+                                                            props: {
+                                                                buttonType: "startTime",
+                                                                value: "Asc"
+                                                            }
+                                                        }
+                                                    },
+                                                    {
+                                                        type: "button",
+                                                        text: "Desc",
+                                                        onPressed: {
+                                                            action: "applyFilter",
+                                                            props: {
+                                                                buttonType: "startTime",
+                                                                value: "Desc"
+                                                            }
+                                                        }
+                                                    },
+                                                ]
+                                            },
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                    ]
+                }
+                , ...playTimeFilter
+                    .map(game => {
+                        return {
+                            type: "widget",
+                            name: "gameCard",
+                            query: {
+                                "$find": {
+                                    "_datastore": playerService.datastoreName,
+                                    "_refs": {
+                                        "$and": [
+                                            {
+                                                "$contains": game._id
+                                            },
+                                            {
+                                                "$contains": "@me"
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            props: {
+                                game
+                            }
                         }
-                    }
-                })
+                    })
+            ]
         }
     };
 }
@@ -69,7 +432,6 @@ function gameCard(players, props) {
     const currentPlayer = players[0];
     var difficulty = props.game.difficulty;
     var finished = (props.game.finished) ? "Finished !" : "Continue game !";
-
     var date = new Date(props.game.lastPlayDate);
     var day = getProperTime(date.getDate());
     var month = getProperTime(date.getMonth());
@@ -158,7 +520,60 @@ function gameCard(players, props) {
     };
 }
 
+
+/**
+ * 
+ * @param {Player[]} players 
+ * @param {{game: Game}} props
+ * @returns 
+ */
+function filterButton(props) {
+    return {
+        type: "actionable",
+        onPressed: {
+            action: "applyFilter",
+            props: {
+                buttonType: props.buttonType,
+                value: props.buttonValue
+            }
+        },
+        child: {
+            type: "container",
+            decoration: {
+                color: 0xFF212121
+            },
+            child: {
+                type: "flex",
+                children: [
+                    // {
+                    //     type: "icon",
+                    //     value: props.icon,
+                    //     color: 0xFFFFFFFF,
+                    //     size: 25
+                    // },
+                    {
+                        type: "container",
+                        padding: {
+                            top: 1,
+                            left: 1,
+                        },
+                        child: {
+                            type: "text",
+                            value: props.buttonText,
+                            style: {
+                                color: 0xFFFFFFFF
+                            }
+                        }
+                    },
+                ]
+            }
+        }
+    }
+}
+
+
 module.exports = {
     gameList,
-    gameCard
+    gameCard,
+    filterButton
 }

@@ -13,6 +13,20 @@ const boardService = require('../services/boardService.js');
 const Cell = require('../classes/Cell.js');
 
 
+
+/**
+ * Creates a category
+ * @param {*} props
+ * @param {*} event
+ * @param {*} api
+ * @returns 
+ */
+async function applyFilter(props, event, api) {
+  const userData = await userService.getUser(api);
+  userData.filters[props.buttonType]=props.value;
+  await userService.updateUser(api, userData);
+}
+
 /**
  * Creates a category
  * @param {*} props
@@ -224,5 +238,6 @@ module.exports = {
   createGame,
   revealCell,
   toggleFlag,
-  toggleFlagging
+  toggleFlagging,
+  applyFilter
 }
