@@ -46,10 +46,10 @@ function gameList(games, props) {
     var resultFilter = gameStateFilter;
     if (!resultAll) {
         var resultDir = {
-            "Winned": true,
-            "Loosed": false
+            "Won": true,
+            "Lost": false
         }
-        if (filters.gameState == "Winned") {
+        if (filters.gameState == "Won") {
             resultFilter = gameStateFilter.filter(game => resultDir[filters.result] == (game.winner == undefined));
         } else {
             resultFilter = gameStateFilter.filter(game => resultDir[filters.result] == (game.winner != undefined) && game.finished);
@@ -244,8 +244,8 @@ function gameList(games, props) {
                                                                 name: "filterButton",
                                                                 props: {
                                                                     buttonType: "result",
-                                                                    buttonValue: "Winned",
-                                                                    buttonText: "Winned"
+                                                                    buttonValue: "Won",
+                                                                    buttonText: "Won"
                                                                 }
                                                             },
                                                             {
@@ -253,8 +253,8 @@ function gameList(games, props) {
                                                                 name: "filterButton",
                                                                 props: {
                                                                     buttonType: "result",
-                                                                    buttonValue: "Loosed",
-                                                                    buttonText: "Loosed"
+                                                                    buttonValue: "Lost",
+                                                                    buttonText: "Lost"
                                                                 }
                                                             },
                                                             {
@@ -444,7 +444,7 @@ function gameCard(players, props) {
     const currentPlayer = players[0];
     var difficulty = props.game.difficulty;
     var finished = (props.game.finished) ? "Finished" : "Continue game";
-    var result = (props.game.finished && props.game.winner != undefined) ? "with a win" : ((props.game.finished && props.game.winner == undefined) ? "with a loose" : "");
+    var result = (props.game.finished && props.game.winner != undefined) ? "with a win" : ((props.game.finished && props.game.winner == undefined) ? "with a lose" : "");
     var date = new Date(props.game.lastPlayDate);
     var day = getProperTime(date.getDate());
     var month = getProperTime(date.getMonth());
