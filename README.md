@@ -1,20 +1,3 @@
-<!-- # Minella
-
-Minella is a minesweeper application with multiple game modes and difficulty levels.
-
-## Single player
-
-This game mode is just the classical minesweeper game.
-
-## Versus
-
-In this game mode, two players are fighting to get the highest score.
-Each player starts with a score of 0 and win one point for each successfully revealed cell.
-The players take turns and the flags are personnal.
-If a player reveals a bomb he lose the game (or lose 10 points ?).
-When all the cells are revealed minus the bomb ones the player with the highest score wins. -->
-
-
 <div id="top"></div>
 <!--
 *** This README was created with https://github.com/othneildrew/Best-README-Template
