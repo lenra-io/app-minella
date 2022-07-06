@@ -51,7 +51,7 @@ Use this command to run Minella :
 docker run -it --rm -p 4000:4000 -v "${PWD}:/home/app/function" lenra/devtools-node12:beta
 ```
 
-You can then access the application by opening `localhost:4000` on your web browser. 
+You can then access the application by opening [`localhost:4000`](http://localhost:4000) on your web browser. 
 
 ### Single player
 
