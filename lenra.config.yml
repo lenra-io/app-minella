@@ -1,6 +1,6 @@
-app:
-  api: beta
-  from: "node:12-alpine"
+api: beta
+containers:
+- from: "node:12-alpine"
   workdir: /home/app
   envs:
     NPM_CONFIG_LOGLEVEL: warn
