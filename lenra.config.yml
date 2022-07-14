@@ -1,0 +1,20 @@
+app:
+  api: beta
+  from: "node:12-alpine"
+  workdir: /home/app
+  envs:
+    NPM_CONFIG_LOGLEVEL: warn
+  needed_envs: []
+  # if not defined use the lenra.install.sh
+  install: npm i
+  watchdog:
+    target_dir: /usr/bin/
+    cgi_headers: "true"
+    fprocess: node index.js
+    mode: http
+    upstream_url: "http://127.0.0.1:3000"
+    port: "3333"
+    exec_timeout: 10s
+    write_timeout: 15s
+    read_timeout: 15s
+    prefix_logs: "false"
