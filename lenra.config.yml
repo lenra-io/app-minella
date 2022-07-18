@@ -1,4 +1,4 @@
-api: beta
+components-api: "1.1"
 containers:
 - from: "node:12-alpine"
   workdir: /home/app
