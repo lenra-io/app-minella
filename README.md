@@ -113,5 +113,5 @@ Project Link: [https://github.com/lenra-io/app-minella](https://github.com/lenra
 [issues-shield]: https://img.shields.io/github/issues/lenra-io/app-minella.svg?style=for-the-badge
 [issues-url]: https://github.com/lenra-io/app-minella/issues
 [license-shield]: https://img.shields.io/github/license/lenra-io/app-minella.svg?style=for-the-badge
-[license-url]: https://github.com/lenra-io/app-minella/blob/master/LICENSE.txt
+[license-url]: https://github.com/lenra-io/app-minella/blob/master/LICENSE
 
