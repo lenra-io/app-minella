@@ -1,16 +1,24 @@
 components-api: "1.1"
-containers:
-- from: "node:12-alpine"
-  workdir: /home/app
+builds:
+  - image: "node:16-alpine"
+    workdir: /tmp/build
+    script:
+      - npm i
+      - npm run build
+    artifacts:
+      - /tmp/build/dist
+image: "node:16-alpine"
+workdir: /home/app
+envs:
+  NPM_CONFIG_LOGLEVEL: warn
+needed_envs: []
+# if not defined use the lenra.install.sh
+script: [npm i --omit=dev]
+watchdog:
+  target_dir: /usr/bin/
   envs:
-    NPM_CONFIG_LOGLEVEL: warn
-  needed_envs: []
-  # if not defined use the lenra.install.sh
-  install: npm i
-  watchdog:
-    target_dir: /usr/bin/
     cgi_headers: "true"
-    fprocess: node index.js
+    fprocess: node server.js
     mode: http
     upstream_url: "http://127.0.0.1:3000"
     port: "3333"
