@@ -1,27 +1,30 @@
-components-api: "1.1"
-builds:
-  - image: "node:16-alpine"
+componentsApi: "1.1"
+builders:
+  - name: build-ts
+    image: "node:16-alpine"
     workdir: /tmp/build
     script:
       - npm i
       - npm run build
-    artifacts:
-      - /tmp/build/dist
 image: "node:16-alpine"
 workdir: /home/app
 envs:
   NPM_CONFIG_LOGLEVEL: warn
 needed_envs: []
-# if not defined use the lenra.install.sh
+user: app
+rootScript: []
 script: [npm i --omit=dev]
+artifacts:
+  - builder: build-ts
+    source: /tmp/build/
+    destination: /home/app/
 watchdog:
-  target_dir: /usr/bin/
-  envs:
+  targetDir: /usr/bin/
+  params:
     cgi_headers: "true"
     fprocess: node server.js
     mode: http
     upstream_url: "http://127.0.0.1:3000"
-    port: "3333"
     exec_timeout: 10s
     write_timeout: 15s
     read_timeout: 15s
