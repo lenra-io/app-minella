@@ -1,5 +1,6 @@
 const YAML = require('yaml');
 const { readFile, writeFile } = require('fs/promises');
+const watchdogBuilder = 'watchdog';
 const watchdogVersion = '0.8.4';
 
 /**
@@ -13,6 +14,9 @@ const watchdogVersion = '0.8.4';
  * @property {string} destination The destination in the current image descriptor
  * @property {string?} mode The destination mode of the artifact
  * 
+ * @typedef namedObject
+ * @property {string} name The element name
+ * 
  * @typedef imageDescriptor Describes a Docker image
  * @property {string} image The initial Docker image
  * @property {string?} workdir The image workdir
@@ -23,11 +27,13 @@ const watchdogVersion = '0.8.4';
  * @property {boolean?} copySources If true, copies the sources filtered by the .dockerignore file to the workdir
  * @property {artifactCopier[]?} artifacts The artifacts of the previous builders
  * 
+ * @typedef {namedObject & imageDescriptor} namedImageDescritor
+ * 
  * @typedef lenraBaseConf The lenra.config.yml expected content
  * @property {string} componentsApi The components API version
  * @property {watchdogConf} watchdog
  * @property {string[]?} needed_envs List of the needed environment variables in the Lenra environment
- * @property {imageDescriptor[] & {name: string?}} builders The builders
+ * @property {namedImageDescritor} builders The builders
  * 
  * @typedef {lenraBaseConf & imageDescriptor} lenraConf
  */
@@ -39,19 +45,23 @@ async function generateDockerfile() {
     const conf = await readFile('lenra.config.yml', 'utf8').then(YAML.parse);
     console.log("conf", conf);
     const buffer = [];
-
-    // TODO: create builders
-
-    buffer.push(`FROM ghcr.io/openfaas/of-watchdog:${watchdogVersion} as watchdog`);
-
-    conf.builders?.forEach((builder, position) => addImageDescription(buffer, { name: `builder-${position}`, ...builder }));
-    addImageDescription(buffer, conf);
-
-    // Copy and configure the watchdog
     const watchdogPath = `${conf.watchdog?.targetDir || '/usr/bin/'}fwatchdog`;
-    buffer.push(`COPY --from=watchdog /fwatchdog "${watchdogPath}"`);
-    buffer.push(`RUN chmod +x "${watchdogPath}"`);
-    Object.entries(conf.watchdog.params).forEach(([key, value]) => buffer.push(`ENV ${key}="${value}"`));
+
+    // Add watchdog to builders
+    if (!conf.builders) conf.builders = [];
+    conf.builders.push({ name: watchdogBuilder, image: `ghcr.io/openfaas/of-watchdog:${watchdogVersion}` });
+
+    conf.builders.forEach((builder, position) => addImageDescription(buffer, { name: `builder-${position}`, ...builder }));
+    addImageDescription(buffer, {
+        ...conf,
+        artifacts: [...conf.artifacts, {
+            builder: watchdogBuilder,
+            source: '/fwatchdog',
+            destination: watchdogPath,
+            mode: '+x'
+        }],
+        envs: { ...conf.envs, ...conf.watchdog.params }
+    });
 
     // Healthcheck and entrypoint
     buffer.push(`HEALTHCHECK --interval=3s CMD [ -e /tmp/.lock ] || exit 1`);
@@ -60,13 +70,13 @@ async function generateDockerfile() {
     await writeFile('Dockerfile', buffer.join('\n'));
 }
 
-const nameRegex = /^[a-z]+([-][a-z]+){0,3}$/;
-const existingNames = ['app', 'watchdog']
+const nameRegex = /^[a-z]+(\-[a-z]+)*$/;
+const existingNames = [];
 
 /**
  * Adds a image descriptor to a buffer
  * @param {string[]} buffer The lines buffer
- * @param {imageDescriptor & {name: string?}} imageDescriptor The image description to add
+ * @param {namedImageDescritor} imageDescriptor The image description to add
  */
 function addImageDescription(buffer, imageDescriptor) {
     if (imageDescriptor.name) {
@@ -77,22 +87,62 @@ function addImageDescription(buffer, imageDescriptor) {
     }
 
     buffer.push(`# ${imageDescriptor.name || 'app'}`);
-    buffer.push(`FROM ${imageDescriptor.image} as ${imageDescriptor.name || 'app'}`);
+    buffer.push(`FROM ${imageDescriptor.image}${(imageDescriptor.name) ? ` as ${imageDescriptor.name}`: ''}`);
 
     // Set env variables
-    if (imageDescriptor.envs) Object.entries(imageDescriptor.envs).forEach(([key, value]) => buffer.push(`ENV ${key}="${value}"`));
+    if (imageDescriptor.envs) addEnvs(buffer, imageDescriptor.envs);
 
-    // TODO: manage pre-install ?
+    // Set workdir
+    if (imageDescriptor.workdir) buffer.push(`WORKDIR ${imageDescriptor.workdir}`);
 
     // Copy sources (filtered by .dockerignore)
-    if (imageDescriptor.workdir) buffer.push(`WORKDIR ${imageDescriptor.workdir}`);
-    buffer.push(`COPY . ./`);
+    if (imageDescriptor.copySources) buffer.push(`COPY . ./`);
 
-    // TODO: copy build artifacts
+    const rootScript = [];
+
+    // Copy build artifacts
+    if (imageDescriptor.artifacts) {
+        imageDescriptor.artifacts.forEach(artifact => {
+            if (imageDescriptor.name == artifact.builder) throw new Error(`The copy can't from the same builder '${artifact.builder}'`);
+            if (!existingNames.includes(artifact.builder)) throw new Error(`The builder '${artifact.builder}' is not found in previous artifacts`);
+            buffer.push(`COPY --from=${artifact.builder} "${artifact.source}" "${artifact.destination}"`);
+            if (artifact.mode) rootScript.push(`chmod -R ${artifact.mode} "${artifact.destination}"`);
+        });
+    }
+
+    if (imageDescriptor.rootScript) rootScript.push.apply(rootScript, imageDescriptor.rootScript);
+
+    // Root script
+    if (rootScript.length > 0) {
+        buffer.push(`USER 0`);
+        addScripts(buffer, rootScript);
+    }
+
+    if (!imageDescriptor.name || imageDescriptor.script?.length) buffer.push(`USER ${imageDescriptor.user || 'app'}`);
 
     // Run install script if any
-    imageDescriptor.script?.forEach(cmd => buffer.push(`RUN ${cmd}`));
+    if (imageDescriptor.script) addScripts(buffer, imageDescriptor.script);
     buffer.push('');
+}
+
+/**
+ * Adds scripts to a Docker image lines buffer
+ * @param {string[]} buffer The buffer
+ * @param {string[]} scripts The scripts to add
+ */
+function addScripts(buffer, scripts) {
+    // TODO: manage multiline script
+    scripts.forEach((cmd, i) => buffer.push(`${(i == 0) ? 'RUN ' : '\t'}${cmd} ${(i < scripts.length - 1) ? ' && \\' : ''}`));
+}
+
+/**
+ * Adds env variables to a Docker image line buffer
+ * @param {string[]} buffer The buffer
+ * @param {Object<string, string>} envs The envs key value map
+ */
+function addEnvs(buffer, envs) {
+    const entries = Object.entries(envs);
+    entries.forEach(([key, value], i) => buffer.push(`${(i == 0) ? 'ENV ' : '\t'}${key}="${value}" ${(i < entries.length - 1) ? ' \\' : ''}`));
 }
 
 /*
