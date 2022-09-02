@@ -40,6 +40,7 @@ if (process.env.RAW_BODY === 'true') {
 }
 
 const middleware = async (req, res) => {
+    console.log("Request body", req.body);
     // Checking whether middleware received a Resource or Action request
     if (req.body.resource) {
         handleAppResource(req, res);
