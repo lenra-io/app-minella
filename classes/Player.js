@@ -1,5 +1,5 @@
-const LenraData = require('./LenraData.js');
 const Cell = require('./Cell.js');
+const Document = require('./Document.js');
 
 class PlayerAction {
     /**
@@ -35,20 +35,17 @@ class FlagAction extends PlayerAction {
     }
 }
 
-module.exports = class Player extends LenraData {
+module.exports = class Player extends Document {
     /**
-     * @param {number} _id Data id
-     * @param {string} _datastore The datastore where the data is stored
-     * @param {number[]} _refs The data references to other datas
-     * @param {number[]} _refBy The other datas referencing the current data
+     * @param {string} _id Doc id
      * @param {Action[]} actions The player actions
      * @param {boolean} flagging If true, the player is adding flags
      * @param {Cell[]} revealedCells The player revealed cells
      * @param {Cell[]} flags The player flags
      * @param {number} score The player score
      */
-    constructor(_id, _datastore, _refs, _refBy, actions, flagging, revealedCells, flags, score) {
-        super(_id, _datastore, _refs, _refBy);
+    constructor(_id, actions, flagging, revealedCells, flags, score) {
+        super(_id);
         this.actions = actions || [];
         this.flagging = flagging;
         this.revealedCells = revealedCells || [];

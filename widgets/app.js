@@ -1,16 +1,16 @@
 'use strict'
 
-const User = require('../classes/User.js');
 const ui = require('./utils/ui.js')
 
 /**
- * @param {User} user 
+ * @param {Navigation[]} navigations 
  * @param {*} _props 
  * @returns 
  */
-module.exports = (users, _props) => {
-  const user = users[0];
-  if (!user.navigation) {
+module.exports = (navigations, _props) => {
+  console.log("app", navigations);
+  const navigation = navigations[0];
+  if (!navigation) {
     return {
       type: "text",
       value: "Loading"
@@ -25,28 +25,27 @@ module.exports = (users, _props) => {
     children: [
       {
         type: "widget",
-        name: `${user.navigation.state.page}_menu`,
+        name: `${navigation.state.page}_menu`,
         props: {
-          state: user.navigation.state
+          state: navigation.state
         }
       },
       {
         type: "widget",
-        name: `${user.navigation.state.page}_content`,
+        name: `${navigation.state.page}_content`,
         props: {
-          state: user.navigation.state,
-          user: user
+          state: navigation.state
         }
       }
     ]
   };
-  if (user.navigation.state.modal) {
+  if (navigation.state.modal) {
     app = {
       type: "stack",
       fit: "expand",
       children: [
         app,
-        modal(user.navigation.state.modal, user)
+        modal(navigation.state.modal, navigation)
       ]
     }
   }
@@ -54,7 +53,7 @@ module.exports = (users, _props) => {
   return app;
 }
 
-function modal(modal, user) {
+function modal(modal, navigation) {
   return {
     // type: "overlayEntry",
     // child: {
@@ -62,7 +61,7 @@ function modal(modal, user) {
     onPressed: {
       action: "closeModal",
       props: {
-        state: user.navigation.state
+        state: navigation.state
       }
     },
     child: {
@@ -106,7 +105,7 @@ function modal(modal, user) {
                 type: "widget",
                 name: `modal_${modal}_content`,
                 props: {
-                  state: user.navigation.state
+                  state: navigation.state
                 }
               }
             }

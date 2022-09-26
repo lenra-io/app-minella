@@ -15,13 +15,9 @@ function content(_data, props) {
     return {
         type: "widget",
         name: "newGame_contentWaiting",
+        coll: waitingPlayerService.collection,
         query: {
-            "$find": {
-                "_datastore": waitingPlayerService.datastoreName,
-                "_refs": {
-                    "$contains": "@me"
-                }
-            }
+            user: "@me"
         },
         props
     }

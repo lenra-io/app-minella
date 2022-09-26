@@ -17,11 +17,9 @@ function content(_data, props) {
     return {
         type: "widget",
         name: "game_gameContent",
+        coll: gameService.collection,
         query: {
-            "$find": {
-                "_datastore": gameService.datastoreName,
-                "_id": props.state.game
-            }
+            "_id": props.state.game
         },
         props: {
             player: props.state.player
@@ -39,13 +37,9 @@ function gameContent(games, props) {
     return {
         type: "widget",
         name: "game_playerContent",
+        coll: playerService.collection,
         query: {
-            "$find": {
-                "_datastore": playerService.datastoreName,
-                "_refs": {
-                    "$contains": game._id
-                }
-            }
+            game: game._id
         },
         props: {
             game,
@@ -90,13 +84,9 @@ function playerContent(players, props) {
         {
             type: "widget",
             name: "board",
+            coll: boardService.collection,
             query: {
-                "$find": {
-                    "_datastore": boardService.datastoreName,
-                    "_refs": {
-                        "$contains": props.game._id
-                    }
-                }
+                game: props.game._id
             },
             props: {
                 game: props.game._id,
@@ -112,7 +102,7 @@ function playerContent(players, props) {
                 fontSize: 20,
                 fontWeight: "w900"
             },
-            value: `${player._id==props.game.winner ? 'You won' : 'You lost'}`
+            value: `${player._id == props.game.winner ? 'You won' : 'You lost'}`
         });
     }
     return {

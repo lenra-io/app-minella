@@ -1,6 +1,6 @@
 'use strict'
 
-const dataService = require("./lenraDataService.js");
+const dataService = require("./lenraDocumentService.js");
 const User = require("../classes/User.js");
 const datastoreName = '_users';
 

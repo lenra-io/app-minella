@@ -58,7 +58,7 @@ async function resetFilters(props, event, api) {
  * @returns 
  */
 async function createGame(props, event, api) {
-  const user = await userService.getUser(api);
+  const user = await navigationService.getUser(api);
   const difficultyIndex = "difficulty" in user.navigation.state ? user.navigation.state.difficulty : 0;
   const difficulty = config.difficulties[difficultyIndex];
   const playerNumber = "playerNumber" in user.navigation.state ? user.navigation.state.playerNumber : 1;
@@ -81,7 +81,7 @@ async function createGame(props, event, api) {
       waitingPlayer._refs.push(user._id);
       waitingPlayer = await waitingPlayerService.createWaitingPlayer(api, waitingPlayer);
       console.log("Created waiting player", waitingPlayer);
-      return navigationService.home(api, user);
+      return navigationService.home(api);
     }
   }
 

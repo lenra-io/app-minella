@@ -10,14 +10,10 @@ function content(_data, props) {
     return {
         type: "widget",
         name: "gameList",
+        coll: gameService.collection,
         query: {
-            "$find": {
-                "_datastore": gameService.datastoreName,
-                "_refs": {
-                    "$contains": "@me"
-                },
-                // "finished": false
-            }
+            user: "@me",
+            finished: false
         },
         props: {
             userData: props.user

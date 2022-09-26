@@ -1,12 +1,12 @@
-const LenraData = require('./LenraData.js');
+const Document = require('./Document.js');
 
-module.exports = class User extends LenraData {
+module.exports = class User extends Document {
     /**
-     * @param {number} _id 
+     * @param {string} _id 
      * @param {*} navigation 
      */
-    constructor(_id, _datastore, _refs, _refBy, navigation) {
-        super(_id, _datastore, _refs, _refBy);
+    constructor(_id, navigation) {
+        super(_id);
         this.navigation = navigation;
     }
 }

@@ -1,43 +1,58 @@
 'use strict'
 
-const userService = require('./userService.js');
+const lenraDocumentService = require('./lenraDocumentService.js');
 const homeNavigation = {
     state: {
         page: 'home'
     },
     history: []
 };
+const collection = 'navigations';
+
+async function getNavigation(api) {
+    const navs = await lenraDocumentService.executeQuery(api, collection, {
+        user: "@me"
+    });
+    return navs[0];
+}
 
 module.exports = {
-    homeNavigation,
-    async home(api, userData) {
-        userData = await userService.getUser(api, userData);
-        userData.navigation = { ...homeNavigation };
-        return userService.updateUser(api, userData);
+    collection,
+    getNavigation,
+    async home(api) {
+        let navigation = await getNavigation(api);
+        console.log("home", navigation);
+        if (!navigation) {
+            console.log("create navigation");
+            return lenraDocumentService.createDoc(api, collection, { ...homeNavigation, user: "@me" });
+        }
+        else {
+            navigation = { ...navigation, ...homeNavigation };
+            return lenraDocumentService.updateDoc(api, collection, navigation);
+        }
     },
-    async updateState(api, userData, stateData) {
-        userData = await userService.getUser(api, userData);
+    async updateState(api, navigation, stateData) {
+        navigation = navigation || await getNavigation(api);
         Object.entries(stateData)
             .forEach(([key, value]) => {
-                userData.navigation.state[key] = value;
+                navigation.state[key] = value;
             });
-        return userService.updateUser(api, userData);
+        return lenraDocumentService.updateDoc(api, collection, navigation);
     },
-    async pushState(api, userData, state) {
-        userData = await userService.getUser(api, userData);
-        if (!userData.navigation) userData.navigation = { ...homeNavigation };
-        userData.navigation.history.push(userData.navigation.state);
-        userData.navigation.state = {
+    async pushState(api, navigation, state) {
+        navigation = navigation || await getNavigation(api);
+        navigation.history.push(navigation.state);
+        navigation.state = {
             ...state
         };
-        return userService.updateUser(api, userData);
+        return lenraDocumentService.updateDoc(api, collection, navigation);
     },
-    async popState(api, userData, times) {
-        userData = await userService.getUser(api, userData);
+    async popState(api, navigation, times) {
+        navigation = navigation || await getNavigation(api);
         // TODO: manage editing category
-        times = Math.max(1, Math.min(userData.navigation.history.length, times || 1));
+        times = Math.max(1, Math.min(navigation.history.length, times || 1));
         while (times-- > 0)
-            userData.navigation.state = userData.navigation.history.pop();
-        return userService.updateUser(api, userData);
+            navigation.state = navigation.history.pop();
+        return lenraDocumentService.updateDoc(api, collection, navigation);
     }
 }

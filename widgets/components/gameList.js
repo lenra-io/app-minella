@@ -395,7 +395,7 @@ function gameList(games, props) {
                             type: "button",
                             text: "Reset filters",
                             onPressed: {
-                                action:"resetFilters"
+                                action: "resetFilters"
                             }
                         }
                     ]
@@ -405,20 +405,10 @@ function gameList(games, props) {
                         return {
                             type: "widget",
                             name: "gameCard",
+                            coll: playerService.collection,
                             query: {
-                                "$find": {
-                                    "_datastore": playerService.datastoreName,
-                                    "_refs": {
-                                        "$and": [
-                                            {
-                                                "$contains": game._id
-                                            },
-                                            {
-                                                "$contains": "@me"
-                                            }
-                                        ]
-                                    }
-                                }
+                                game: game._id,
+                                user: "@me"
                             },
                             props: {
                                 game

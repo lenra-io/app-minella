@@ -8,11 +8,11 @@ const fs = require('fs');
 const express = require('express')
 const app = express()
 
-const manifestHandler = require('./index');
-
-let listenerHandlers = null;
-let widgetHandlers = null;
-let manifest = null;
+const listenerHandlers = require('./listeners/all.js');
+const widgetHandlers = require('./widgets/all.js');
+const manifest = {
+    rootWidget: 'main'
+};
 
 const defaultMaxSize = '100kb' // body-parser default
 
@@ -64,52 +64,21 @@ function handleAppResource(req, res) {
     }
 }
 
-async function initManifest() {
-    if (manifest == null) {
-        let tempManifest = await manifestHandler();
-        widgetHandlers = tempManifest.widgets;
-        listenerHandlers = tempManifest.listeners || {};
-        widgetHandlers = tempManifest.widgets;
-        listenerHandlers = tempManifest.listeners || {};
-        manifest = {
-            widgets: Object.keys(widgetHandlers),
-            listeners: Object.keys(listenerHandlers),
-            rootWidget: tempManifest.rootWidget
-        };
-    }
-    return Promise.resolve(manifest);
-}
-
 async function handleAppManifest(req, res) {
-
-    let uiStartTime = process.hrtime.bigint();
-
-    return initManifest().then(manifest => {
-        let uiStopTime = process.hrtime.bigint();
-
-        res.status(200).json({ manifest: manifest, stats: { ui: Number(uiStopTime - uiStartTime) } });
-    })
-        .catch(err => {
-            const err_string = err.toString ? err.toString() : err;
-            console.error("handleAppManifest:", err_string);
-            res.status(500).send(err_string);
-        });
+    res.status(200).json({ manifest: manifest });
 }
 
 async function handleAppWidget(req, res) {
 
     let { widget, data, props } = req.body;
 
-    let uiStartTime = process.hrtime.bigint();
-
     if (Object.keys(widgetHandlers).includes(widget)) {
         let possibleFutureRes = widgetHandlers[widget](data, props)
 
         return Promise.resolve(possibleFutureRes)
             .then(widget => {
-                let uiStopTime = process.hrtime.bigint();
 
-                res.status(200).json({ widget: widget, stats: { ui: Number(uiStopTime - uiStartTime) } });
+                res.status(200).json({ widget: widget });
             })
             .catch(err => {
                 const err_string = err.toString ? err.toString() : err;
@@ -132,26 +101,17 @@ async function handleAppWidget(req, res) {
  * If an event is triggered, the matched event function provided by the app is triggered.
  * The event can be a listener or a widget update.
  */
-async function handleAppListener(req, res) {
-
-    let newData = {};
-
-    let { action, data, props, event } = req.body;
-
-    let listenersStartTime = process.hrtime.bigint();
-
+ async function handleAppListener(req, res) {
+    let { action, props, event, api } = req.body;
     /*
         listeners file need to exactly math with action name
     */
     if (Object.keys(listenerHandlers).includes(action)) {
-        let possibleFutureRes = listenerHandlers[action](data, props, event);
+        let possibleFutureRes = listenerHandlers[action](props, event, api);
 
         return Promise.resolve(possibleFutureRes)
-            .then(data => {
-                let listenersStopTime = process.hrtime.bigint();
-                newData = data;
-
-                res.status(200).json({ data: newData, stats: { listeners: Number(listenersStopTime - listenersStartTime) } });
+            .then(() => {
+                res.status(200).send();
             })
             .catch(err => {
                 const err_string = err.toString ? err.toString() : err;
@@ -170,9 +130,5 @@ app.post('/*', middleware);
 const port = process.env.http_port || 3000;
 
 app.listen(port, () => {
-    initManifest().then(() => {
-        console.log(`node listening on port: ${port}`)
-    }).catch(err => {
-        console.error(err);
-    });
+    console.log(`node listening on port: ${port}`);
 });

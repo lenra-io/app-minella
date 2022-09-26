@@ -1,26 +1,27 @@
 componentsApi: "1-beta"
 generator:
   dofigen:
-    from: "node:16-alpine"
-    user: "0"
+    from: "bitnami/node:16"
     workdir: /app
+    root:
+      run:
+      # - mkdir -p /app
+      - chown -R 1000 /app
     adds:
     - .
     run:
     - npm i --omit=dev
     ports:
     - 3000
-    cmd: 
-    - npm start
+    cmd:
+      - node
+      - server.js
     ignores:
     - "**"
     - "!/*.json"
     - "!/server.js"
-    - "!/index.js"
     - "!/listeners/"
     - "!/widgets/"
     - "!/classes/"
     - "!/services/"
     - "!/resources/"
-dev:
-  devtoolTag: local
