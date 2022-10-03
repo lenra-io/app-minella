@@ -37,7 +37,7 @@ function contentWaiting(waitingPlayers, props) {
     return {
         type: "flex",
         direction: "vertical",
-        spacing: 2,
+        spacing: 16,
         crossAxisAlignment: "center",
         children: [
             choiceSelector(
@@ -80,7 +80,7 @@ function choiceSelector(name, property, values, value) {
         type: "flex",
         direction: "vertical",
         crossAxisAlignment: "center",
-        spacing: 1,
+        spacing: 8,
         children: [
             {
                 type: "text",
@@ -91,7 +91,7 @@ function choiceSelector(name, property, values, value) {
             },
             {
                 type: "flex",
-                spacing: 2,
+                spacing: 16,
                 children: values.map(v => ({
                     type: "button",
                     text: v.display,

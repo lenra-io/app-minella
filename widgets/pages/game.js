@@ -65,7 +65,7 @@ function gameContent(games, props) {
         crossAxisAlignment: "center",
         // fillParent: true,
         // scroll: true,
-        spacing: 2,
+        spacing: 16,
         children
     }
 }
@@ -112,13 +112,8 @@ function playerContent(players, props) {
         crossAxisAlignment: "center",
         // fillParent: true,
         // scroll: true,
-        spacing: 2,
-        padding: {
-            top: 2,
-            left: 2,
-            right: 2,
-            bottom: 2
-        },
+        spacing: 16,
+        padding: ui.padding.all(16),
         children
     }
 }
@@ -145,7 +140,7 @@ function boardHeader(bombs, players, currentPlayer) {
         },
         {
             type: "container",
-            padding: ui.padding.all(1),
+            padding: ui.padding.all(8),
             child: {
                 type: "text",
                 value: `${remainingPins}`
@@ -154,7 +149,7 @@ function boardHeader(bombs, players, currentPlayer) {
     ];
     return {
         type: "flex",
-        spacing: 2,
+        spacing: 16,
         mainAxisAlignment: "center",
         fillParent: true,
         children

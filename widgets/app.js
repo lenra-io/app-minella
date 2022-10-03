@@ -20,7 +20,7 @@ module.exports = (navigations, _props) => {
     type: "flex",
     direction: "vertical",
     scroll: true,
-    spacing: 4,
+    spacing: 32,
     crossAxisAlignment: "center",
     children: [
       {
@@ -72,7 +72,7 @@ function modal(modal, navigation) {
       child: {
         type: "flex",
         direction: "vertical",
-        spacing: 1,
+        spacing: 8,
         fillParent: true,
         mainAxisAlignment: "center",
         crossAxisAlignment: "center",
@@ -98,9 +98,9 @@ function modal(modal, navigation) {
                   },
                   color: 0x1A000000
                 },
-                borderRadius: ui.borderRadius.all(2)
+                borderRadius: ui.borderRadius.all(16)
               },
-              padding: ui.padding.all(2),
+              padding: ui.padding.all(16),
               child: {
                 type: "widget",
                 name: `modal_${modal}_content`,

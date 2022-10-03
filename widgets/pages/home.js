@@ -9,11 +9,17 @@ const { flag } = require('../utils/icons.js');
  */
 function content(_data, props) {
     return {
-        type: "widget",
-        name: "home_filters",
-        coll: filterService.collection,
-        query: {
-            user: "@me"
+        type: "container",
+        constraints: {
+            maxWidth: 600
+        },
+        child: {
+            type: "widget",
+            name: "home_filters",
+            coll: filterService.collection,
+            query: {
+                user: "@me"
+            }
         }
     }
 }
@@ -29,9 +35,6 @@ function filters(filters, props) {
         query: {
             user: "@me",
             finished: false
-        },
-        props: {
-            userData: props.user
         }
     }
 }

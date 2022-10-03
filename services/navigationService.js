@@ -13,6 +13,7 @@ async function getNavigation(api) {
     const navs = await lenraDocumentService.executeQuery(api, collection, {
         user: "@me"
     });
+    console.log("getNavigation", navs);
     return navs[0];
 }
 
@@ -41,6 +42,7 @@ module.exports = {
     },
     async pushState(api, navigation, state) {
         navigation = navigation || await getNavigation(api);
+        console.log("pushState", navigation);
         navigation.history.push(navigation.state);
         navigation.state = {
             ...state

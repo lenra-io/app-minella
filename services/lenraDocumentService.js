@@ -11,8 +11,8 @@ module.exports = {
      * @param {string} id The data id
      * @returns {Promise<LenraData>}
      */
-    getDoc(api, coll, id) {
-        return axios.get(`${api.url}/app/colls/${coll}/docs/${id}`, options(api));
+    async getDoc(api, coll, id) {
+        return (await axios.get(`${api.url}/app/colls/${coll}/docs/${id}`, options(api))).data;
     },
     /**
      * Creates a document in a given collection
@@ -21,8 +21,8 @@ module.exports = {
      * @param {LenraData} doc The document to create
      * @returns {Promise<LenraData>}
      */
-    createDoc(api, coll, doc) {
-        return axios.post(`${api.url}/app/colls/${coll}/docs`, doc, options(api));
+    async createDoc(api, coll, doc) {
+        return (await axios.post(`${api.url}/app/colls/${coll}/docs`, doc, options(api))).data;
     },
     /**
      * Updates a given document
@@ -31,8 +31,8 @@ module.exports = {
      * @param {LenraData} doc The document to save
      * @returns {Promise<LenraData>}
      */
-    updateDoc(api, coll, doc) {
-        return axios.put(`${api.url}/app/colls/${coll}/docs/${doc._id}`, doc, options(api));
+    async updateDoc(api, coll, doc) {
+        return (await axios.put(`${api.url}/app/colls/${coll}/docs/${doc._id}`, doc, options(api))).data;
     },
     /**
      * Deletes a document
@@ -51,8 +51,8 @@ module.exports = {
      * @param {*} query The query
      * @returns {Promise<LenraData[]>}
      */
-    executeQuery(api, coll, query) {
-        return axios.post(`${api.url}/app/colls/${coll}/docs/find`, query, options(api));
+    async executeQuery(api, coll, query) {
+        return (await axios.post(`${api.url}/app/colls/${coll}/docs/find`, query, options(api))).data;
     }
 }
 
