@@ -14,7 +14,7 @@ module.exports = {
     async getUser(api, userData) {
         if (userData) {
             if (userData._id) return userData;
-            return await dataService.getData(api, datastoreName, userData);
+            return await dataService.getDoc(api, datastoreName, userData);
         }
         return await dataService.executeQuery(api, {
             "$find": {
@@ -35,6 +35,6 @@ module.exports = {
             user._refs = undefined;
             user._refBy = undefined;
         }
-        return dataService.updateData(api, datastoreName, user);
+        return dataService.updateDoc(api, datastoreName, user);
     }
 }

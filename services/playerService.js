@@ -12,7 +12,7 @@ module.exports = {
      * @returns {Promise<Player>}
      */
     async createPlayer(api, player) {
-        return dataService.createData(api, collection, player);
+        return dataService.createDoc(api, collection, player);
     },
     /**
      * @param {*} api 
@@ -20,7 +20,7 @@ module.exports = {
      * @returns {Promise<Player>}
      */
     async getPlayer(api, playerId) {
-        return dataService.getData(api, collection, playerId);
+        return dataService.getDoc(api, collection, playerId);
     },
     /**
      * @param {*} api 
@@ -38,6 +38,6 @@ module.exports = {
      * @returns {Promise<Player>}
      */
     async updatePlayer(api, player) {
-        return await dataService.updateData(api, collection, player);
+        return await dataService.updateDoc(api, collection, player);
     }
 }

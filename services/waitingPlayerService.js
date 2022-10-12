@@ -12,7 +12,7 @@ module.exports = {
      * @returns {Promise<WaitingPlayer>}
      */
     async createWaitingPlayer(api, player) {
-        return dataService.createData(api, collection, player);
+        return dataService.createDoc(api, collection, player);
     },
     /**
      * @param {*} api 
@@ -23,7 +23,10 @@ module.exports = {
     async getWaitingPlayers(api, difficulty, playerNumber) {
         return dataService.executeQuery(api, collection, {
             difficulty,
-            playerNumber
+            playerNumber,
+            user: {
+                $not: "@me"
+            },
         });
     },
     /**
@@ -32,6 +35,6 @@ module.exports = {
      * @returns {Promise<void>}
      */
     async deleteWaitingPlayer(api, player) {
-        return await dataService.deleteData(api, collection, player._id);
+        return await dataService.deleteDoc(api, collection, player._id);
     }
 }

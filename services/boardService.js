@@ -28,6 +28,6 @@ module.exports = {
      * @returns {Promise<Board>}
      */
     async updateBoard(api, board) {
-        return await dataService.updateData(api, collection, board);
+        return await dataService.updateDoc(api, collection, board);
     }
 }

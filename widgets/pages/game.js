@@ -13,7 +13,7 @@ const config = require('../../config.json');
  * @returns 
  */
 function content(_data, props) {
-    console.log("game_content", props);
+    console.log("game::content", props);
     return {
         type: "widget",
         name: "game_gameContent",
@@ -34,6 +34,7 @@ function content(_data, props) {
  */
 function gameContent(games, props) {
     const game = games[0];
+    console.log("game::gameContent", game, props);
     return {
         type: "widget",
         name: "game_playerContent",
@@ -76,7 +77,7 @@ function gameContent(games, props) {
  * @returns 
  */
 function playerContent(players, props) {
-    console.log("playerContent", props);
+    console.log("game::playerContent", props);
     const player = players.find(p => p._id == props.player);
     const difficulty = config.difficulties[props.game.difficulty];
     const children = [

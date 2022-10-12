@@ -20,7 +20,7 @@ module.exports = {
      * @returns {Promise<Game>}
      */
     async getGame(api, gameId) {
-        return dataService.getData(api, collection, gameId);
+        return dataService.getDoc(api, collection, gameId);
     },
     /**
      * @param {*} api 
@@ -28,6 +28,6 @@ module.exports = {
      * @returns {Promise<Game>}
      */
     async updateGame(api, game) {
-        return await dataService.updateData(api, collection, game);
+        return await dataService.updateDoc(api, collection, game);
     }
 }

@@ -58,27 +58,27 @@ async function resetFilters(props, event, api) {
  * @returns 
  */
 async function createGame(props, event, api) {
-  const user = await navigationService.getUser(api);
-  const difficultyIndex = "difficulty" in user.navigation.state ? user.navigation.state.difficulty : 0;
+  const navigation = await navigationService.getNavigation(api);
+  const difficultyIndex = "difficulty" in navigation.state ? navigation.state.difficulty : 0;
   const difficulty = config.difficulties[difficultyIndex];
-  const playerNumber = "playerNumber" in user.navigation.state ? user.navigation.state.playerNumber : 1;
+  const playerNumber = "playerNumber" in navigation.state ? navigation.state.playerNumber : 1;
   const promises = [];
 
-  const playersIds = [user._id];
+  const playersIds = ["@me"];
   if (playerNumber != 1) {
     // Check if there waiting players with the same params
     let waitingPlayers = await waitingPlayerService.getWaitingPlayers(api, difficultyIndex, playerNumber);
     if (waitingPlayers.length > 0) {
       const waitingPlayer = waitingPlayers[0];
       console.log("Found waiting player", waitingPlayer);
-      playersIds.push(waitingPlayer._refs[0]);
+      playersIds.push(waitingPlayer.user);
       promises.push(waitingPlayerService.deleteWaitingPlayer(api, waitingPlayer));
     }
     else {
       let waitingPlayer = new WaitingPlayer();
       waitingPlayer.difficulty = difficultyIndex;
       waitingPlayer.playerNumber = playerNumber;
-      waitingPlayer._refs.push(user._id);
+      waitingPlayer.user = "@me";
       waitingPlayer = await waitingPlayerService.createWaitingPlayer(api, waitingPlayer);
       console.log("Created waiting player", waitingPlayer);
       return navigationService.home(api);
@@ -107,31 +107,37 @@ async function createGame(props, event, api) {
   }
   let board = new Board();
   board.cells = m;
-  const boardPromise = boardService.createBoard(api, board);
+  board = await boardService.createBoard(api, board);
+
+  game.users = playersIds;
+  game.board = board._id;
+  const gamePromise = gameService.createGame(api, game);
 
   const players = await Promise.all(
     playersIds.map(id => {
       let player = new Player();
-      player._refs.push(id);
+      player.user = id;
+      player.game = game._id;
       return playerService.createPlayer(api, player);
     })
   );
-  const currentPlayer = players.find(p => p._refs.includes(user._id));
-  board = await boardPromise;
-  game._refs = playersIds;
-  game._refBy = [...players.map(p => p._id), board._id];
+  console.log("players", players);
+  const currentPlayer = players.find(p => p.user = navigation.user);
   const firstPlayerPos = Math.round(Math.random() * (players.length - 1));
   const firstPlayer = players[firstPlayerPos];
+  game = await gamePromise;
+
+  game.players = players.map(p => p._id);
   game.firstPlayer = firstPlayer._id;
-  game = await gameService.createGame(api, game);
+  console.log("update game", game);
+  game = await gameService.updateGame(api, game);
 
   console.log("game created", game, players);
-  user.navigation.state = {
+  promises.push(navigationService.updateState(api, navigation, {
     page: "game",
     game: game._id,
     player: currentPlayer._id
-  };
-  promises.push(userService.updateUser(api, user));
+  }));
   return Promise.all(promises);
 }
 

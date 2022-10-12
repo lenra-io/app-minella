@@ -8,8 +8,8 @@ const ui = require('./utils/ui.js')
  * @returns 
  */
 module.exports = (navigations, _props) => {
-  console.log("app", navigations);
   const navigation = navigations[0];
+  console.log("app", navigation);
   if (!navigation) {
     return {
       type: "text",

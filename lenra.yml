@@ -5,7 +5,6 @@ generator:
     workdir: /app
     root:
       run:
-      # - mkdir -p /app
       - chown -R 1000 /app
     adds:
     - .
