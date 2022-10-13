@@ -111,7 +111,7 @@ async function createGame(props, event, api) {
 
   game.users = playersIds;
   game.board = board._id;
-  const gamePromise = gameService.createGame(api, game);
+  game = await gameService.createGame(api, game);
 
   const players = await Promise.all(
     playersIds.map(id => {
@@ -125,7 +125,6 @@ async function createGame(props, event, api) {
   const currentPlayer = players.find(p => p.user = navigation.user);
   const firstPlayerPos = Math.round(Math.random() * (players.length - 1));
   const firstPlayer = players[firstPlayerPos];
-  game = await gamePromise;
 
   game.players = players.map(p => p._id);
   game.firstPlayer = firstPlayer._id;

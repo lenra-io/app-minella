@@ -73,9 +73,15 @@ async function handleAppWidget(req, res) {
     let { widget, data, props } = req.body;
 
     if (Object.keys(widgetHandlers).includes(widget)) {
-        let possibleFutureRes = widgetHandlers[widget](data, props)
+        let possibleFutureRes;
+        try {
+            possibleFutureRes = Promise.resolve(widgetHandlers[widget](data, props));
+        }
+        catch (e) {
+            possibleFutureRes = Promise.reject(e);
+        }
 
-        return Promise.resolve(possibleFutureRes)
+        return possibleFutureRes
             .then(widget => {
 
                 res.status(200).json({ widget: widget });

@@ -77,7 +77,7 @@ function gameContent(games, props) {
  * @returns 
  */
 function playerContent(players, props) {
-    console.log("game::playerContent", props);
+    console.log("game::playerContent", players, props);
     const player = players.find(p => p._id == props.player);
     const difficulty = config.difficulties[props.game.difficulty];
     const children = [
@@ -87,7 +87,7 @@ function playerContent(players, props) {
             name: "board",
             coll: boardService.collection,
             query: {
-                game: props.game._id
+                _id: props.game.board
             },
             props: {
                 game: props.game._id,
