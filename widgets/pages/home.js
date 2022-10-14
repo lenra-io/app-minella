@@ -33,8 +33,12 @@ function filters(filters, props) {
         name: "gameList",
         coll: gameService.collection,
         query: {
-            user: "@me",
-            finished: false
+            users: "@me",
+            // finished: {
+            //     $not: {
+            //         $eq: true
+            //     }
+            // }
         }
     }
 }
