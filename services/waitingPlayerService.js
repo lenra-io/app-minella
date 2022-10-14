@@ -25,7 +25,9 @@ module.exports = {
             difficulty,
             playerNumber,
             user: {
-                $not: "@me"
+                $not: {
+                    $eq: "@me"
+                }
             },
         });
     },
@@ -35,6 +37,6 @@ module.exports = {
      * @returns {Promise<void>}
      */
     async deleteWaitingPlayer(api, player) {
-        return await dataService.deleteDoc(api, collection, player._id);
+        return await dataService.deleteDoc(api, collection, player);
     }
 }
