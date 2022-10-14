@@ -191,7 +191,6 @@ async function revealCell(props, event, api) {
     }
   }
   else {
-    [].push.apply(revealedCells, newRevealedCells);
     const difficulty = config.difficulties[game.difficulty];
     if (revealedCells.length == difficulty.rows * difficulty.columns - difficulty.bombs) {
       console.log("Game finished");
