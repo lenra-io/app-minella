@@ -148,13 +148,64 @@ function boardHeader(bombs, players, currentPlayer) {
             }
         }
     ];
-    return {
+    let ret = {
         type: "flex",
-        spacing: 16,
+        spacing: 8,
         mainAxisAlignment: "center",
-        fillParent: true,
         children
+    };
+
+    if (players.length>1) {
+        let otherPlayer = players.filter(p => p._id!=currentPlayer._id)[0];
+        ret = {
+            type: "flex",
+            spacing: 16,
+            mainAxisAlignment: "center",
+            crossAxisAlignment: "center",
+            children: [
+                playerCounter(currentPlayer, true),
+                ret,
+                playerCounter(otherPlayer, false),
+            ]
+        };
     }
+    ret.fillParent = true;
+
+    return ret;
+}
+
+/**
+ * 
+ * @param {Player} player The player
+ * @param {boolean} isCurrentPlayer True if the given player is the current one
+ * @returns 
+ */
+function playerCounter(player, isCurrentPlayer) {
+    console.log("player", player);
+    return {
+        type: "container",
+        constraints: ui.constraints.all(32),
+        border: ui.border.all({
+          color: ui.color.black,
+          width: isCurrentPlayer ? 2 : 1
+        }),
+        decoration: {
+          color: isCurrentPlayer ? ui.color.blue : ui.color.red
+        },
+        child: {
+          type: "flex",
+          mainAxisAlignment: "center",
+          crossAxisAlignment: "center",
+          children: [{
+            type: "text",
+            style: {
+              fontSize: 16,
+              fontWeight: "w900"
+            },
+            value: `${player.points || 0}`,
+          }]
+        }
+      }
 }
 
 /**
