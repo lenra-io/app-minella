@@ -55,6 +55,18 @@ function gameList(games, props) {
     //         resultFilter = gameStateFilter.filter(game => resultDir[filters.result] == (game.winner != undefined) && game.finished);
     //     }
     // }
+    // var resultFilter = gameStateFilter;
+    // if (!resultAll) {
+    //     var resultDir = {
+    //         "Won": true,
+    //         "Lost": false
+    //     }
+    //     if (filters.gameState == "Won") {
+    //         resultFilter = gameStateFilter.filter(game => resultDir[filters.result] == (game.winner == undefined));
+    //     } else {
+    //         resultFilter = gameStateFilter.filter(game => resultDir[filters.result] == (game.winner != undefined) && game.finished);
+    //     }
+    // }
 
     // var startTimeFilter = resultFilter;
     // if (!startTimeNone) {
