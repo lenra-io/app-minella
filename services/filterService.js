@@ -9,7 +9,7 @@ const collection = 'filters';
      * @returns {Promise<Game>}
      */
 async function getCurrentUserFilter(api) {
-    const filters = dataService.executeQuery(api, collection, {
+    const filters = await dataService.executeQuery(api, collection, {
         user: "@me"
     });
     return filters[0];
@@ -23,7 +23,7 @@ module.exports = {
      * @returns {Promise<Game>}
      */
     async setFilter(api, prop, value) {
-        let filter = getCurrentUserFilter(api);
+        let filter = await getCurrentUserFilter(api);
         if (filter) {
             // TODO: check if props in filter list
             if (value === undefined)

@@ -1,5 +1,4 @@
 const navigationService = require('../services/navigationService.js');
-const userService = require('../services/userService.js');
 const widgets = {
   main,
   app: require('./app'),

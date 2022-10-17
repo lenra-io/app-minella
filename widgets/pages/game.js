@@ -103,7 +103,7 @@ function playerContent(players, props) {
                 fontSize: 20,
                 fontWeight: "w900"
             },
-            value: `${player._id == props.game.winner ? 'You won' : 'You lost'}`
+            value: `${player._id == props.game.winner ? 'You won' : 'You lose'}`
         });
     }
     return {

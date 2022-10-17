@@ -1,6 +1,4 @@
-const User = require('../../classes/User.js');
 const navigationService = require('../../services/navigationService.js');
-const userService = require('../../services/userService.js');
 const ui = require('../utils/ui.js')
 
 function menu(data, props) {

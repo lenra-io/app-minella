@@ -1,4 +1,3 @@
-const userService = require('../services/userService.js');
 const Game = require('../classes/Game.js');
 const gameService = require('../services/gameService.js');
 const navigationService = require('../services/navigationService.js');
@@ -22,14 +21,14 @@ const Cell = require('../classes/Cell.js');
  * @returns 
  */
 async function applyFilter(props, event, api) {
-  const userData = await userService.getUser(api);
-  if (props.buttonType == "playTime") {
-    userData.filters["startTime"] = "None";
-  } else if (props.buttonType == "startTime") {
-    userData.filters["playTime"] = "None";
-  }
-  userData.filters[props.buttonType] = props.value;
-  await userService.updateUser(api, userData);
+  // const userData = await userService.getUser(api);
+  // if (props.buttonType == "playTime") {
+  //   userData.filters["startTime"] = "None";
+  // } else if (props.buttonType == "startTime") {
+  //   userData.filters["playTime"] = "None";
+  // }
+  // userData.filters[props.buttonType] = props.value;
+  // await userService.updateUser(api, userData);
 }
 
 /**
@@ -40,14 +39,14 @@ async function applyFilter(props, event, api) {
  * @returns 
  */
 async function resetFilters(props, event, api) {
-  const userData = await userService.getUser(api);
-  userData.filters.difficulty = "All";
-  userData.filters.gameState = "All";
-  userData.filters.playTime = "None";
-  userData.filters.result = "All";
-  userData.filters.startTime = "None";
-  userData.filters[props.buttonType] = props.value;
-  await userService.updateUser(api, userData);
+  // const userData = await userService.getUser(api);
+  // userData.filters.difficulty = "All";
+  // userData.filters.gameState = "All";
+  // userData.filters.playTime = "None";
+  // userData.filters.result = "All";
+  // userData.filters.startTime = "None";
+  // userData.filters[props.buttonType] = props.value;
+  // await userService.updateUser(api, userData);
 }
 
 /**

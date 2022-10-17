@@ -34,11 +34,12 @@ function filters(filters, _props) {
         coll: gameService.collection,
         query: {
             users: "@me",
-            finished: {
-                $not: {
-                    $eq: true
-                }
-            }
+            // Not available for now
+            // finished: {
+            //     $not: {
+            //         $eq: true
+            //     }
+            // }
         }
     }
 }
