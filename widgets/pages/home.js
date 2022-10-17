@@ -7,7 +7,7 @@ const { flag } = require('../utils/icons.js');
  * @param {*} props 
  * @returns 
  */
-function content(_data, props) {
+function content(_data, _props) {
     return {
         type: "container",
         constraints: {
@@ -24,7 +24,7 @@ function content(_data, props) {
     }
 }
 
-function filters(filters, props) {
+function filters(filters, _props) {
     const filter = filters[0] || {};
     // TODO: Display filters
     // TODO: filter the query with the filters
@@ -34,11 +34,11 @@ function filters(filters, props) {
         coll: gameService.collection,
         query: {
             users: "@me",
-            // finished: {
-            //     $not: {
-            //         $eq: true
-            //     }
-            // }
+            finished: {
+                $not: {
+                    $eq: true
+                }
+            }
         }
     }
 }
@@ -48,7 +48,7 @@ function filters(filters, props) {
  * @param {*} props 
  * @returns 
  */
-function menu(_data, props) {
+function menu(_data, _props) {
     return {
         type: "widget",
         name: "menu",
