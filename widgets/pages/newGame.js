@@ -96,7 +96,7 @@ function choiceSelector(name, property, values, value) {
                     type: "button",
                     text: v.display,
                     mainStyle: v.value == value ? "primary" : "secondary",
-                    onPressed: {
+                    onPressed: v.value == value ? undefined : {
                         action: 'setStateProperty',
                         props: {
                             property,
