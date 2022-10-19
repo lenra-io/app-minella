@@ -1,0 +1,26 @@
+componentsApi: "1-beta"
+generator:
+  dofigen:
+    from: "bitnami/node:16"
+    workdir: /app
+    root:
+      run:
+      - chown -R 1000 /app
+    adds:
+    - .
+    run:
+    - npm i --omit=dev
+    ports:
+    - 3000
+    cmd:
+      - node
+      - server.js
+    ignores:
+    - "**"
+    - "!/*.json"
+    - "!/server.js"
+    - "!/listeners/"
+    - "!/widgets/"
+    - "!/classes/"
+    - "!/services/"
+    - "!/resources/"

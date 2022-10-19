@@ -1,4 +1,5 @@
 const gameService = require('../../services/gameService.js');
+const filterService = require('../../services/filterService.js');
 const { flag } = require('../utils/icons.js');
 
 /**
@@ -6,21 +7,39 @@ const { flag } = require('../utils/icons.js');
  * @param {*} props 
  * @returns 
  */
-function content(_data, props) {
+function content(_data, _props) {
+    return {
+        type: "container",
+        constraints: {
+            maxWidth: 600
+        },
+        child: {
+            type: "widget",
+            name: "home_filters",
+            coll: filterService.collection,
+            query: {
+                user: "@me"
+            }
+        }
+    }
+}
+
+function filters(filters, _props) {
+    const filter = filters[0] || {};
+    // TODO: Display filters
+    // TODO: filter the query with the filters
     return {
         type: "widget",
         name: "gameList",
+        coll: gameService.collection,
         query: {
-            "$find": {
-                "_datastore": gameService.datastoreName,
-                "_refs": {
-                    "$contains": "@me"
-                },
-                // "finished": false
-            }
-        },
-        props: {
-            userData: props.user
+            users: "@me",
+            // Not available for now
+            // finished: {
+            //     $not: {
+            //         $eq: true
+            //     }
+            // }
         }
     }
 }
@@ -30,7 +49,7 @@ function content(_data, props) {
  * @param {*} props 
  * @returns 
  */
-function menu(_data, props) {
+function menu(_data, _props) {
     return {
         type: "widget",
         name: "menu",
@@ -51,4 +70,5 @@ function menu(_data, props) {
 module.exports = {
     content,
     menu,
+    filters,
 }

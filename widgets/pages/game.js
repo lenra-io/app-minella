@@ -13,15 +13,13 @@ const config = require('../../config.json');
  * @returns 
  */
 function content(_data, props) {
-    console.log("game_content", props);
+    console.log("game::content", props);
     return {
         type: "widget",
         name: "game_gameContent",
+        coll: gameService.collection,
         query: {
-            "$find": {
-                "_datastore": gameService.datastoreName,
-                "_id": props.state.game
-            }
+            "_id": props.state.game
         },
         props: {
             player: props.state.player
@@ -36,16 +34,13 @@ function content(_data, props) {
  */
 function gameContent(games, props) {
     const game = games[0];
+    console.log("game::gameContent", game, props);
     return {
         type: "widget",
         name: "game_playerContent",
+        coll: playerService.collection,
         query: {
-            "$find": {
-                "_datastore": playerService.datastoreName,
-                "_refs": {
-                    "$contains": game._id
-                }
-            }
+            game: game._id
         },
         props: {
             game,
@@ -71,7 +66,7 @@ function gameContent(games, props) {
         crossAxisAlignment: "center",
         // fillParent: true,
         // scroll: true,
-        spacing: 2,
+        spacing: 16,
         children
     }
 }
@@ -82,7 +77,7 @@ function gameContent(games, props) {
  * @returns 
  */
 function playerContent(players, props) {
-    console.log("playerContent", props);
+    console.log("game::playerContent", players, props);
     const player = players.find(p => p._id == props.player);
     const difficulty = config.difficulties[props.game.difficulty];
     const children = [
@@ -90,13 +85,9 @@ function playerContent(players, props) {
         {
             type: "widget",
             name: "board",
+            coll: boardService.collection,
             query: {
-                "$find": {
-                    "_datastore": boardService.datastoreName,
-                    "_refs": {
-                        "$contains": props.game._id
-                    }
-                }
+                _id: props.game.board
             },
             props: {
                 game: props.game._id,
@@ -112,7 +103,7 @@ function playerContent(players, props) {
                 fontSize: 20,
                 fontWeight: "w900"
             },
-            value: `${player._id==props.game.winner ? 'You won' : 'You lost'}`
+            value: `${player._id == props.game.winner ? 'You won' : 'You lose'}`
         });
     }
     return {
@@ -122,13 +113,8 @@ function playerContent(players, props) {
         crossAxisAlignment: "center",
         // fillParent: true,
         // scroll: true,
-        spacing: 2,
-        padding: {
-            top: 2,
-            left: 2,
-            right: 2,
-            bottom: 2
-        },
+        spacing: 16,
+        padding: ui.padding.all(16),
         children
     }
 }
@@ -155,20 +141,71 @@ function boardHeader(bombs, players, currentPlayer) {
         },
         {
             type: "container",
-            padding: ui.padding.all(1),
+            padding: ui.padding.all(8),
             child: {
                 type: "text",
                 value: `${remainingPins}`
             }
         }
     ];
-    return {
+    let ret = {
         type: "flex",
-        spacing: 2,
+        spacing: 8,
         mainAxisAlignment: "center",
-        fillParent: true,
         children
+    };
+
+    if (players.length>1) {
+        let otherPlayer = players.filter(p => p._id!=currentPlayer._id)[0];
+        ret = {
+            type: "flex",
+            spacing: 16,
+            mainAxisAlignment: "center",
+            crossAxisAlignment: "center",
+            children: [
+                playerCounter(currentPlayer, true),
+                ret,
+                playerCounter(otherPlayer, false),
+            ]
+        };
     }
+    ret.fillParent = true;
+
+    return ret;
+}
+
+/**
+ * 
+ * @param {Player} player The player
+ * @param {boolean} isCurrentPlayer True if the given player is the current one
+ * @returns 
+ */
+function playerCounter(player, isCurrentPlayer) {
+    console.log("player", player);
+    return {
+        type: "container",
+        constraints: ui.constraints.all(32),
+        border: ui.border.all({
+          color: ui.color.black,
+          width: isCurrentPlayer ? 2 : 1
+        }),
+        decoration: {
+          color: isCurrentPlayer ? ui.color.blue : ui.color.red
+        },
+        child: {
+          type: "flex",
+          mainAxisAlignment: "center",
+          crossAxisAlignment: "center",
+          children: [{
+            type: "text",
+            style: {
+              fontSize: 16,
+              fontWeight: "w900"
+            },
+            value: `${player.points || 0}`,
+          }]
+        }
+      }
 }
 
 /**

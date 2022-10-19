@@ -1,18 +1,18 @@
 'use strict'
 
-const dataService = require("./lenraDataService.js");
+const dataService = require("./lenraDocumentService.js");
 const Game = require("../classes/Game.js");
-const datastoreName = 'games';
+const collection = 'games';
 
 module.exports = {
-    datastoreName,
+    collection,
     /**
      * @param {*} api 
      * @param {Game} game The game 
      * @returns {Promise<Game>}
      */
     async createGame(api, game) {
-        return dataService.createData(api, datastoreName, game);
+        return dataService.createDoc(api, collection, game);
     },
     /**
      * @param {*} api 
@@ -20,7 +20,7 @@ module.exports = {
      * @returns {Promise<Game>}
      */
     async getGame(api, gameId) {
-        return dataService.getData(api, datastoreName, gameId);
+        return dataService.getDoc(api, collection, gameId);
     },
     /**
      * @param {*} api 
@@ -28,6 +28,6 @@ module.exports = {
      * @returns {Promise<Game>}
      */
     async updateGame(api, game) {
-        return await dataService.updateData(api, datastoreName, game);
+        return await dataService.updateDoc(api, collection, game);
     }
 }

@@ -1,4 +1,3 @@
-const userService = require('../services/userService.js');
 const Game = require('../classes/Game.js');
 const gameService = require('../services/gameService.js');
 const navigationService = require('../services/navigationService.js');
@@ -22,14 +21,14 @@ const Cell = require('../classes/Cell.js');
  * @returns 
  */
 async function applyFilter(props, event, api) {
-  const userData = await userService.getUser(api);
-  if (props.buttonType == "playTime") {
-    userData.filters["startTime"] = "None";
-  } else if (props.buttonType == "startTime") {
-    userData.filters["playTime"] = "None";
-  }
-  userData.filters[props.buttonType] = props.value;
-  await userService.updateUser(api, userData);
+  // const userData = await userService.getUser(api);
+  // if (props.buttonType == "playTime") {
+  //   userData.filters["startTime"] = "None";
+  // } else if (props.buttonType == "startTime") {
+  //   userData.filters["playTime"] = "None";
+  // }
+  // userData.filters[props.buttonType] = props.value;
+  // await userService.updateUser(api, userData);
 }
 
 /**
@@ -40,14 +39,14 @@ async function applyFilter(props, event, api) {
  * @returns 
  */
 async function resetFilters(props, event, api) {
-  const userData = await userService.getUser(api);
-  userData.filters.difficulty = "All";
-  userData.filters.gameState = "All";
-  userData.filters.playTime = "None";
-  userData.filters.result = "All";
-  userData.filters.startTime = "None";
-  userData.filters[props.buttonType] = props.value;
-  await userService.updateUser(api, userData);
+  // const userData = await userService.getUser(api);
+  // userData.filters.difficulty = "All";
+  // userData.filters.gameState = "All";
+  // userData.filters.playTime = "None";
+  // userData.filters.result = "All";
+  // userData.filters.startTime = "None";
+  // userData.filters[props.buttonType] = props.value;
+  // await userService.updateUser(api, userData);
 }
 
 /**
@@ -58,30 +57,30 @@ async function resetFilters(props, event, api) {
  * @returns 
  */
 async function createGame(props, event, api) {
-  const user = await userService.getUser(api);
-  const difficultyIndex = "difficulty" in user.navigation.state ? user.navigation.state.difficulty : 0;
+  const navigation = await navigationService.getNavigation(api);
+  const difficultyIndex = "difficulty" in navigation.state ? navigation.state.difficulty : 0;
   const difficulty = config.difficulties[difficultyIndex];
-  const playerNumber = "playerNumber" in user.navigation.state ? user.navigation.state.playerNumber : 1;
+  const playerNumber = "playerNumber" in navigation.state ? navigation.state.playerNumber : 1;
   const promises = [];
 
-  const playersIds = [user._id];
+  const playersIds = ["@me"];
   if (playerNumber != 1) {
     // Check if there waiting players with the same params
     let waitingPlayers = await waitingPlayerService.getWaitingPlayers(api, difficultyIndex, playerNumber);
     if (waitingPlayers.length > 0) {
       const waitingPlayer = waitingPlayers[0];
       console.log("Found waiting player", waitingPlayer);
-      playersIds.push(waitingPlayer._refs[0]);
+      playersIds.push(waitingPlayer.user);
       promises.push(waitingPlayerService.deleteWaitingPlayer(api, waitingPlayer));
     }
     else {
       let waitingPlayer = new WaitingPlayer();
       waitingPlayer.difficulty = difficultyIndex;
       waitingPlayer.playerNumber = playerNumber;
-      waitingPlayer._refs.push(user._id);
+      waitingPlayer.user = "@me";
       waitingPlayer = await waitingPlayerService.createWaitingPlayer(api, waitingPlayer);
       console.log("Created waiting player", waitingPlayer);
-      return navigationService.home(api, user);
+      return navigationService.home(api);
     }
   }
 
@@ -107,31 +106,36 @@ async function createGame(props, event, api) {
   }
   let board = new Board();
   board.cells = m;
-  const boardPromise = boardService.createBoard(api, board);
+  board = await boardService.createBoard(api, board);
+
+  game.users = playersIds;
+  game.board = board._id;
+  game = await gameService.createGame(api, game);
 
   const players = await Promise.all(
     playersIds.map(id => {
       let player = new Player();
-      player._refs.push(id);
+      player.user = id;
+      player.game = game._id;
       return playerService.createPlayer(api, player);
     })
   );
-  const currentPlayer = players.find(p => p._refs.includes(user._id));
-  board = await boardPromise;
-  game._refs = playersIds;
-  game._refBy = [...players.map(p => p._id), board._id];
+  console.log("players", players);
+  const currentPlayer = players.find(p => p.user = navigation.user);
   const firstPlayerPos = Math.round(Math.random() * (players.length - 1));
   const firstPlayer = players[firstPlayerPos];
+
+  game.players = players.map(p => p._id);
   game.firstPlayer = firstPlayer._id;
-  game = await gameService.createGame(api, game);
+  console.log("update game", game);
+  game = await gameService.updateGame(api, game);
 
   console.log("game created", game, players);
-  user.navigation.state = {
+  promises.push(navigationService.updateState(api, navigation, {
     page: "game",
     game: game._id,
     player: currentPlayer._id
-  };
-  promises.push(userService.updateUser(api, user));
+  }));
   return Promise.all(promises);
 }
 
@@ -186,7 +190,6 @@ async function revealCell(props, event, api) {
     }
   }
   else {
-    [].push.apply(revealedCells, newRevealedCells);
     const difficulty = config.difficulties[game.difficulty];
     if (revealedCells.length == difficulty.rows * difficulty.columns - difficulty.bombs) {
       console.log("Game finished");

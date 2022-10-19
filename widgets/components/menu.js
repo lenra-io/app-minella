@@ -1,16 +1,13 @@
-const User = require('../../classes/User.js');
-const userService = require('../../services/userService.js');
+const navigationService = require('../../services/navigationService.js');
 const ui = require('../utils/ui.js')
 
 function menu(data, props) {
     const children = [{
         type: "widget",
         name: "ariane",
+        coll: navigationService.collection,
         query: {
-            "$find": {
-                "_datastore": userService.datastoreName,
-                "_id": "@me"
-            }
+            user: "@me"
         }
     }];
     if (props && props.mainAction) {
@@ -37,24 +34,24 @@ function menu(data, props) {
             fillParent: true,
             mainAxisAlignment: "spaceBetween",
             crossAxisAlignment: "center",
-            padding: ui.padding.symmetric(4, 2),
+            padding: ui.padding.symmetric(32, 16),
             children
         }
     }
 }
 
 /**
- * @param {User[]} users
+ * @param {Navigation[]} navs
  * @param {*} _props 
  * @returns 
  */
-function ariane(users, _props) {
-    const user = users[0];
+function ariane(navs, _props) {
+    const navigation = navs[0];
     return {
         type: "flex",
         crossAxisAlignment: "center",
         children: [
-            ...user.navigation.history.flatMap((state, i) => {
+            ...navigation.history.flatMap((state, i) => {
                 return [
                     fillWidgetPageName(state, {
                         type: "button",
@@ -62,7 +59,7 @@ function ariane(users, _props) {
                         onPressed: {
                             action: "popState",
                             props: {
-                                times: user.navigation.history.length - i
+                                times: navigation.history.length - i
                             }
                         }
                     }),
@@ -72,9 +69,9 @@ function ariane(users, _props) {
                     }
                 ]
             }),
-            fillWidgetPageName(user.navigation.state, {
+            fillWidgetPageName(navigation.state, {
                 type: "container",
-                padding: ui.padding.symmetric(2, 1),
+                padding: ui.padding.symmetric(16, 8),
                 child: {
                     type: "text"
                 }
@@ -84,8 +81,8 @@ function ariane(users, _props) {
 }
 
 /**
- * @param {User} user 
  * @param {*} state 
+ * @param {*} widget 
  * @returns 
  */
 function fillWidgetPageName(state, widget) {

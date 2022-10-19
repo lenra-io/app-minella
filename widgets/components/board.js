@@ -20,13 +20,9 @@ function board(boards, props) {
       {
         type: "widget",
         name: "boardPlayers",
+        coll: playerService.collection,
         query: {
-          "$find": {
-            "_datastore": playerService.datastoreName,
-            "_refs": {
-              "$contains": props.game
-            }
-          }
+          game: props.game
         },
         props: {
           game: props.game,

@@ -15,13 +15,9 @@ function content(_data, props) {
     return {
         type: "widget",
         name: "newGame_contentWaiting",
+        coll: waitingPlayerService.collection,
         query: {
-            "$find": {
-                "_datastore": waitingPlayerService.datastoreName,
-                "_refs": {
-                    "$contains": "@me"
-                }
-            }
+            user: "@me"
         },
         props
     }
@@ -41,7 +37,7 @@ function contentWaiting(waitingPlayers, props) {
     return {
         type: "flex",
         direction: "vertical",
-        spacing: 2,
+        spacing: 16,
         crossAxisAlignment: "center",
         children: [
             choiceSelector(
@@ -84,7 +80,7 @@ function choiceSelector(name, property, values, value) {
         type: "flex",
         direction: "vertical",
         crossAxisAlignment: "center",
-        spacing: 1,
+        spacing: 8,
         children: [
             {
                 type: "text",
@@ -95,12 +91,12 @@ function choiceSelector(name, property, values, value) {
             },
             {
                 type: "flex",
-                spacing: 2,
+                spacing: 16,
                 children: values.map(v => ({
                     type: "button",
                     text: v.display,
                     mainStyle: v.value == value ? "primary" : "secondary",
-                    onPressed: {
+                    onPressed: v.value == value ? undefined : {
                         action: 'setStateProperty',
                         props: {
                             property,

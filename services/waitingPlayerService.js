@@ -1,18 +1,18 @@
 'use strict'
 
-const dataService = require("./lenraDataService.js");
+const dataService = require("./lenraDocumentService.js");
 const WaitingPlayer = require('../classes/WaitingPlayer.js');
-const datastoreName = 'waitingPlayers';
+const collection = 'waitingPlayers';
 
 module.exports = {
-    datastoreName,
+    collection,
     /**
      * @param {*} api 
      * @param {WaitingPlayer} player 
      * @returns {Promise<WaitingPlayer>}
      */
     async createWaitingPlayer(api, player) {
-        return dataService.createData(api, datastoreName, player);
+        return dataService.createDoc(api, collection, player);
     },
     /**
      * @param {*} api 
@@ -21,12 +21,14 @@ module.exports = {
      * @returns {Promise<WaitingPlayer>}
      */
     async getWaitingPlayers(api, difficulty, playerNumber) {
-        return dataService.executeQuery(api, {
-            "$find": {
-                "_datastore": datastoreName,
-                difficulty,
-                playerNumber
-            }
+        return dataService.executeQuery(api, collection, {
+            difficulty,
+            playerNumber,
+            user: {
+                $not: {
+                    $eq: "@me"
+                }
+            },
         });
     },
     /**
@@ -35,6 +37,6 @@ module.exports = {
      * @returns {Promise<void>}
      */
     async deleteWaitingPlayer(api, player) {
-        return await dataService.deleteData(api, datastoreName, player._id);
+        return await dataService.deleteDoc(api, collection, player);
     }
 }

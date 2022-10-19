@@ -1,15 +1,12 @@
-const LenraData = require('./LenraData.js');
+const Document = require('./Document.js');
 
-module.exports = class Board extends LenraData {
+module.exports = class Board extends Document {
     /**
-     * @param {number} _id Data id
-     * @param {string} _datastore The datastore where the data is stored
-     * @param {number[]} _refs The data references to other datas
-     * @param {number[]} _refBy The other datas referencing the current data
+     * @param {string} _id Doc id
      * @param {number[][]} cells The game cells
      */
-    constructor(_id, _datastore, _refs, _refBy, cells) {
-        super(_id, _datastore, _refs, _refBy);
+    constructor(_id, cells) {
+        super(_id);
         this.cells = cells;
     }
 }
