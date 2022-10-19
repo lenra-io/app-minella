@@ -166,7 +166,7 @@ async function revealCell(props, event, api) {
   const isBomb = newRevealedCells == null;
   if (isBomb) newRevealedCells = [cell];
   else if (game.playerNumber > 1) {
-    currentPlayer.points += newRevealedCells.reduce((score, c) => score + board.cells[c.y][c.x], 0);
+    currentPlayer.points += newRevealedCells.reduce((points, c) => points + board.cells[c.y][c.x], 0);
   }
   const action = new RevealAction(
     Date.now(),
@@ -195,7 +195,7 @@ async function revealCell(props, event, api) {
       console.log("Game finished");
       game.finished = true;
       if (game.playerNumber > 1) {
-        game.winner = players[0].score > players[1].score ? players[0]._id : players[1]._id;
+        game.winner = players[0].points > players[1].points ? players[0]._id : players[1]._id;
       }
       else game.winner = currentPlayer._id;
     }

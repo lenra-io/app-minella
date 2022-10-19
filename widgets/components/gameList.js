@@ -87,6 +87,10 @@ function gameList(games, props) {
         children: [
             ...games
                 .map(game => {
+                    console.log("gameCard query", {
+                        game: game._id,
+                        user: "@me"
+                    });
                     return {
                         type: "widget",
                         name: "gameCard",

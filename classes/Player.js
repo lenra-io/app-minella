@@ -42,15 +42,15 @@ module.exports = class Player extends Document {
      * @param {boolean} flagging If true, the player is adding flags
      * @param {Cell[]} revealedCells The player revealed cells
      * @param {Cell[]} flags The player flags
-     * @param {number} score The player score
+     * @param {number} points The player score
      */
-    constructor(_id, actions, flagging, revealedCells, flags, score) {
+    constructor(_id, actions, flagging, revealedCells, flags, points) {
         super(_id);
         this.actions = actions || [];
         this.flagging = flagging;
         this.revealedCells = revealedCells || [];
         this.flags = flags || [];
-        this.score = score || 0;
+        this.points = points || 0;
     }
 
     static RevealAction = RevealAction;
