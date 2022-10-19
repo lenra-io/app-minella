@@ -16,7 +16,7 @@ module.exports = {
     },
     /**
      * @param {*} api 
-     * @param {number} playerId 
+     * @param {string} playerId 
      * @returns {Promise<Player>}
      */
     async getPlayer(api, playerId) {
@@ -24,7 +24,7 @@ module.exports = {
     },
     /**
      * @param {*} api 
-     * @param {number} gameId 
+     * @param {string} gameId 
      * @returns {Promise<Player[]>}
      */
     async getGamePlayers(api, gameId) {

@@ -148,7 +148,7 @@ async function createGame(props, event, api) {
  */
 async function revealCell(props, event, api) {
   // get game
-  const game = await gameService.getGame(api, props.game);
+  let game = await gameService.getGame(api, props.game);
   if (game.finished) return;
   // get board
   const board = await boardService.getBoard(api, props.board);
@@ -184,20 +184,13 @@ async function revealCell(props, event, api) {
   if (isBomb) {
     // TODO: handle multiplayer system
     console.log("Found bomb", game, currentPlayer);
-    game.finished = true;
-    if (game.playerNumber > 1) {
-      game.winner = players.find(p => p._id != currentPlayer._id)._id;
-    }
+    game = endGame(game, players, currentPlayer);
   }
   else {
     const difficulty = config.difficulties[game.difficulty];
     if (revealedCells.length == difficulty.rows * difficulty.columns - difficulty.bombs) {
       console.log("Game finished");
-      game.finished = true;
-      if (game.playerNumber > 1) {
-        game.winner = players[0].points > players[1].points ? players[0]._id : players[1]._id;
-      }
-      else game.winner = currentPlayer._id;
+      game = endGame(game, players, currentPlayer);
     }
   }
   await gameService.updateGame(api, game);
@@ -266,11 +259,49 @@ async function toggleFlagging(props, event, api) {
   return playerService.updatePlayer(api, player);
 }
 
+/**
+ * Toggle current user flagging
+ * @param {*} props
+ * @param {*} event
+ * @param {*} api
+ * @returns 
+ */
+async function resign(props, event, api) {
+  const gamePromise = gameService.getGame(api, props.game);
+  const players = await playerService.getGamePlayers(api, props.game);
+  const game = endGame(await gamePromise, players, players.find(p => p._id == props.player))
+  return gameService.updateGame(api, game);
+}
+
+/**
+ * End a game
+ * @param {Game} game The ending game
+ * @param {Player[]} players The game players
+ * @param {Player} loser The game loser
+ */
+function endGame(game, players, loser) {
+  game.finished = true;
+  if (game.playerNumber > 1) {
+    if (loser) {
+      game.winner = players.find(p => p._id != loser._id)._id;
+    }
+    else {
+      if (players[0].points == players[1].points) game.winner = null;
+      else game.winner = players[0].points > players[1].points ? players[0]._id : players[1]._id;
+    }
+  }
+  else if (!loser) {
+    game.winner = players[0]._id;
+  }
+  return game;
+}
+
 module.exports = {
   createGame,
   revealCell,
   toggleFlag,
   toggleFlagging,
   applyFilter,
-  resetFilters
+  resetFilters,
+  resign,
 }

@@ -22,9 +22,7 @@ module.exports = {
      * @returns {Promise<LenraData>}
      */
     async createDoc(api, coll, doc) {
-        const resp = await axios.post(`${api.url}/app/colls/${coll}/docs`, doc, options(api));
-        console.log("doc created", resp);
-        return resp.data;
+        return (await axios.post(`${api.url}/app/colls/${coll}/docs`, doc, options(api))).data;
     },
     /**
      * Updates a given document

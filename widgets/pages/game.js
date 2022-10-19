@@ -35,34 +35,38 @@ function content(_data, props) {
 function gameContent(games, props) {
     const game = games[0];
     console.log("game::gameContent", game, props);
-    return {
-        type: "widget",
-        name: "game_playerContent",
-        coll: playerService.collection,
-        query: {
-            game: game._id
-        },
-        props: {
-            game,
-            player: props.player
-        }
-    };
     const children = [
-    ];
-    if (game.finished) {
-        children.unshift({
-            type: "text",
-            style: {
-                fontSize: 20,
-                fontWeight: "w900"
+        {
+            type: "widget",
+            name: "game_playerContent",
+            coll: playerService.collection,
+            query: {
+                game: game._id
             },
-            value: ""
+            props: {
+                game,
+                player: props.player
+            }
+        }
+    ];
+    if (game.playerNumber>1) {
+        children.push({
+            type: "button",
+            text: "Resign",
+            disabled: game.finished,
+            onPressed: {
+                action: 'resign',
+                props: {
+                    game: game_id,
+                    player: props.player
+                }
+            }
         });
     }
     return {
         type: "flex",
         direction: "vertical",
-        // mainAxisAlignment: "center",
+        mainAxisAlignment: "center",
         crossAxisAlignment: "center",
         // fillParent: true,
         // scroll: true,

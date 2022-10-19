@@ -88,7 +88,7 @@ async function handleAppWidget(req, res) {
             })
             .catch(err => {
                 const err_string = err.toString ? err.toString() : err;
-                console.error('handleAppWidget:', err_string);
+                console.error('handleAppWidget:', err_string, err.stack);
                 res.status(500).send(err_string);
             });
     } else {

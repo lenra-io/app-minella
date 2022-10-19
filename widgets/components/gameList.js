@@ -122,7 +122,12 @@ function gameCard(players, props) {
     const currentPlayer = players[0];
     var difficulty = props.game.difficulty;
     var finished = (props.game.finished) ? "Finished" : "Continue game";
-    var result = (props.game.finished && props.game.winner != undefined) ? "with a win" : ((props.game.finished && props.game.winner == undefined) ? "with a lose" : "");
+    var result = "";
+    if (props.game.finished) {
+        if (props.game.winner == currentPlayer._id) result = "with a win";
+        else if (props.game.playerNumber > 1 && props.game.winner == null) result = "with a draw";
+        else result = "with lose";
+    }
     var date = new Date(props.game.lastPlayDate);
     var day = getProperTime(date.getDate());
     var month = getProperTime(date.getMonth());
