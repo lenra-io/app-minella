@@ -190,7 +190,7 @@ async function revealCell(props, event, api) {
     const difficulty = config.difficulties[game.difficulty];
     if (revealedCells.length == difficulty.rows * difficulty.columns - difficulty.bombs) {
       console.log("Game finished");
-      game = endGame(game, players, currentPlayer);
+      game = endGame(game, players);
     }
   }
   await gameService.updateGame(api, game);

@@ -57,7 +57,7 @@ function gameContent(games, props) {
             onPressed: {
                 action: 'resign',
                 props: {
-                    game: game_id,
+                    game: game._id,
                     player: props.player
                 }
             }
@@ -77,13 +77,18 @@ function gameContent(games, props) {
 
 /**
  * @param {Player[]} players 
- * @param {*} props 
+ * @param {{game: Game}} props 
  * @returns 
  */
 function playerContent(players, props) {
     console.log("game::playerContent", players, props);
     const player = players.find(p => p._id == props.player);
     const difficulty = config.difficulties[props.game.difficulty];
+    let myTurn = true;
+    if (props.game.playerNumber>1) {
+        if (props.game.lastPlayer) myTurn = player._id != props.game.lastPlayer;
+        else myTurn = player._id == props.game.firstPlayer;
+    }
     const children = [
         boardHeader(difficulty.bombs, players, player),
         {
@@ -96,7 +101,7 @@ function playerContent(players, props) {
             props: {
                 game: props.game._id,
                 player: player._id,
-                myTurn: props.game.playerNumber == 1 || player._id != props.game.lastPlayer
+                myTurn
             }
         }
     ];
