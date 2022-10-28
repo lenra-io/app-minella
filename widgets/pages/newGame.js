@@ -30,7 +30,6 @@ function content(_data, props) {
  */
 function contentWaiting(waitingPlayers, props) {
     const difficulties = config.difficulties;
-    console.log(waitingPlayers);
     const difficulty = "difficulty" in props.state ? props.state.difficulty : 0;
     const playerNumber = "playerNumber" in props.state ? props.state.playerNumber : 1;
     const waiting = waitingPlayers.filter(p => p.difficulty==difficulty && p.playerNumber==playerNumber).length > 0;

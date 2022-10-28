@@ -108,7 +108,6 @@ async function createGame(props, event, api) {
   board.cells = m;
   board = await boardService.createBoard(api, board);
 
-  game.users = playersIds;
   game.board = board._id;
   game = await gameService.createGame(api, game);
 
@@ -120,14 +119,14 @@ async function createGame(props, event, api) {
       return playerService.createPlayer(api, player);
     })
   );
-  console.log("players", players);
   const currentPlayer = players.find(p => p.user = navigation.user);
   const firstPlayerPos = Math.round(Math.random() * (players.length - 1));
   const firstPlayer = players[firstPlayerPos];
 
+  console.log("update game", game);
+  game.users = playersIds;
   game.players = players.map(p => p._id);
   game.firstPlayer = firstPlayer._id;
-  console.log("update game", game);
   game = await gameService.updateGame(api, game);
 
   console.log("game created", game, players);

@@ -13,7 +13,6 @@ const config = require('../../config.json');
  * @returns 
  */
 function content(_data, props) {
-    console.log("game::content", props);
     return {
         type: "widget",
         name: "game_gameContent",
@@ -34,7 +33,6 @@ function content(_data, props) {
  */
 function gameContent(games, props) {
     const game = games[0];
-    console.log("game::gameContent", game, props);
     const children = [
         {
             type: "widget",
@@ -81,7 +79,6 @@ function gameContent(games, props) {
  * @returns 
  */
 function playerContent(players, props) {
-    console.log("game::playerContent", players, props);
     const player = players.find(p => p._id == props.player);
     const difficulty = config.difficulties[props.game.difficulty];
     let myTurn = true;
@@ -134,7 +131,6 @@ function playerContent(players, props) {
  * @param {Player} currentPlayer The current player
  */
 function boardHeader(bombs, players, currentPlayer) {
-    console.log("boardHeader", players, currentPlayer);
     const remainingPins = bombs - currentPlayer.flags.length;
     const children = [
         {
@@ -190,7 +186,6 @@ function boardHeader(bombs, players, currentPlayer) {
  * @returns 
  */
 function playerCounter(player, isCurrentPlayer) {
-    console.log("player", player);
     return {
         type: "container",
         constraints: ui.constraints.all(32),
