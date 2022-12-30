@@ -18,7 +18,7 @@ function board(boards, props) {
     scroll: true,
     children: [
       {
-        type: "widget",
+        type: "view",
         name: "boardPlayers",
         coll: playerService.collection,
         query: {

@@ -88,7 +88,7 @@ function gameList(games, props) {
             ...games
                 .map(game => {
                     return {
-                        type: "widget",
+                        type: "view",
                         name: "gameCard",
                         coll: playerService.collection,
                         query: {

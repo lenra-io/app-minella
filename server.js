@@ -9,9 +9,9 @@ const express = require('express')
 const app = express()
 
 const listenerHandlers = require('./listeners/all.js');
-const widgetHandlers = require('./widgets/all.js');
+const viewHandlers = require('./views/all.js');
 const manifest = {
-    rootWidget: 'main'
+    rootView: 'main'
 };
 
 const defaultMaxSize = '100kb' // body-parser default
@@ -45,8 +45,8 @@ const middleware = async (req, res) => {
         handleAppResource(req, res);
     } else if (req.body.action) {
         handleAppListener(req, res);
-    } else if (req.body.widget) {
-        handleAppWidget(req, res);
+    } else if (req.body.view) {
+        handleAppView(req, res);
     } else {
         handleAppManifest(req, res);
     }
@@ -67,31 +67,31 @@ async function handleAppManifest(req, res) {
     res.status(200).json({ manifest: manifest });
 }
 
-async function handleAppWidget(req, res) {
+async function handleAppView(req, res) {
 
-    let { widget, data, props } = req.body;
+    let { view, data, props } = req.body;
 
-    if (Object.keys(widgetHandlers).includes(widget)) {
+    if (Object.keys(viewHandlers).includes(view)) {
         let possibleFutureRes;
         try {
-            possibleFutureRes = Promise.resolve(widgetHandlers[widget](data, props));
+            possibleFutureRes = Promise.resolve(viewHandlers[view](data, props));
         }
         catch (e) {
             possibleFutureRes = Promise.reject(e);
         }
 
         return possibleFutureRes
-            .then(widget => {
+            .then(view => {
 
-                res.status(200).json({ widget: widget });
+                res.status(200).json({ view: view });
             })
             .catch(err => {
                 const err_string = err.toString ? err.toString() : err;
-                console.error('handleAppWidget:', err_string, err.stack);
+                console.error('handleAppView:', err_string, err.stack);
                 res.status(500).send(err_string);
             });
     } else {
-        let msg = `No widget found for name ${widget} in app manifest.`;
+        let msg = `No view found for name ${view} in app manifest.`;
         console.error(msg);
         res.status(404).send(msg);
     }
@@ -104,7 +104,7 @@ async function handleAppWidget(req, res) {
  * This function will call the index.js file of the application
  * when the page change.
  * If an event is triggered, the matched event function provided by the app is triggered.
- * The event can be a listener or a widget update.
+ * The event can be a listener or a view update.
  */
  async function handleAppListener(req, res) {
     let { action, props, event, api } = req.body;

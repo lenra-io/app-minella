@@ -20,7 +20,7 @@ generator:
     - "!/*.json"
     - "!/server.js"
     - "!/listeners/"
-    - "!/widgets/"
+    - "!/views/"
     - "!/classes/"
     - "!/services/"
     - "!/resources/"

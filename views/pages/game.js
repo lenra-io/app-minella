@@ -14,7 +14,7 @@ const config = require('../../config.json');
  */
 function content(_data, props) {
     return {
-        type: "widget",
+        type: "view",
         name: "game_gameContent",
         coll: gameService.collection,
         query: {
@@ -35,7 +35,7 @@ function gameContent(games, props) {
     const game = games[0];
     const children = [
         {
-            type: "widget",
+            type: "view",
             name: "game_playerContent",
             coll: playerService.collection,
             query: {
@@ -89,7 +89,7 @@ function playerContent(players, props) {
     const children = [
         boardHeader(difficulty.bombs, players, player),
         {
-            type: "widget",
+            type: "view",
             name: "board",
             coll: boardService.collection,
             query: {
@@ -219,7 +219,7 @@ function playerCounter(player, isCurrentPlayer) {
  */
 function menu(_data, props) {
     return {
-        type: "widget",
+        type: "view",
         name: "menu"
     }
 }
