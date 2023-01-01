@@ -80,6 +80,7 @@ function gameContent(games, props) {
  */
 function playerContent(players, props) {
     const player = players.find(p => p._id == props.player);
+    if (!player) throw new Error(`Current player ${props.player} not found in ${players}`);
     const difficulty = config.difficulties[props.game.difficulty];
     let myTurn = true;
     if (props.game.playerNumber>1) {

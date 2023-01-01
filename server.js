@@ -87,7 +87,7 @@ async function handleAppView(req, res) {
             })
             .catch(err => {
                 const err_string = err.toString ? err.toString() : err;
-                console.error('handleAppView:', err_string, err.stack);
+                console.error(`handleAppView for view ${view}\ndata: `, data, '\nprops: ', props, '\nerror: ', err.stack || err_string);
                 res.status(500).send(err_string);
             });
     } else {
@@ -106,7 +106,7 @@ async function handleAppView(req, res) {
  * If an event is triggered, the matched event function provided by the app is triggered.
  * The event can be a listener or a view update.
  */
- async function handleAppListener(req, res) {
+async function handleAppListener(req, res) {
     let { action, props, event, api } = req.body;
     /*
         listeners file need to exactly math with action name
@@ -120,7 +120,7 @@ async function handleAppView(req, res) {
             })
             .catch(err => {
                 const err_string = err.toString ? err.toString() : err;
-                console.error('handleAppAction:', err_string);
+                console.error(`handleAppListener for action ${action}\nprops: `, props, '\nevent: ', event, '\nerror: ', err.stack || err_string);
                 res.status(500).send(err_string);
             });
     } else {
