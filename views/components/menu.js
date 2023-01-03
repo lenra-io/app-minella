@@ -3,7 +3,7 @@ const ui = require('../utils/ui.js')
 
 function menu(data, props) {
     const children = [{
-        type: "widget",
+        type: "view",
         name: "ariane",
         coll: navigationService.collection,
         query: {
@@ -53,7 +53,7 @@ function ariane(navs, _props) {
         children: [
             ...navigation.history.flatMap((state, i) => {
                 return [
-                    fillWidgetPageName(state, {
+                    fillViewPageName(state, {
                         type: "button",
                         mainStyle: "tertiary",
                         onPressed: {
@@ -69,7 +69,7 @@ function ariane(navs, _props) {
                     }
                 ]
             }),
-            fillWidgetPageName(navigation.state, {
+            fillViewPageName(navigation.state, {
                 type: "container",
                 padding: ui.padding.symmetric(16, 8),
                 child: {
@@ -82,43 +82,43 @@ function ariane(navs, _props) {
 
 /**
  * @param {*} state 
- * @param {*} widget 
+ * @param {*} view 
  * @returns 
  */
-function fillWidgetPageName(state, widget) {
+function fillViewPageName(state, view) {
     switch (state.page) {
         case 'home':
-            return fillWidgetText(widget, 'Minella');
+            return fillViewText(view, 'Minella');
         case 'game':
-            return fillWidgetText(widget, 'Game');
+            return fillViewText(view, 'Game');
         case 'newGame':
-            return fillWidgetText(widget, 'New game');
+            return fillViewText(view, 'New game');
         default:
             console.error(`Not managed page ${state.page}`);
-            return fillWidgetText(widget, state.page);
+            return fillViewText(view, state.page);
     }
 }
 
 /**
- * @param {*} widget
+ * @param {*} view
  * @param {string} text 
  * @returns 
  */
-function fillWidgetText(widget, text) {
-    switch (widget.type) {
+function fillViewText(view, text) {
+    switch (view.type) {
         case "container":
-            widget = { ...widget, child: fillWidgetText(widget.child, text) };
+            view = { ...view, child: fillViewText(view.child, text) };
             break;
         case "text":
-            widget = { ...widget, value: text };
+            view = { ...view, value: text };
             break;
         case "button":
-            widget = { ...widget, text };
+            view = { ...view, text };
             break;
         default:
-            console.error(`Not managed widget type ${widget.type}`);
+            console.error(`Not managed view type ${view.type}`);
     }
-    return widget;
+    return view;
 }
 
 module.exports = {

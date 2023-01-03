@@ -13,7 +13,7 @@ const waitingPlayerService = require('../../services/waitingPlayerService.js');
  */
 function content(_data, props) {
     return {
-        type: "widget",
+        type: "view",
         name: "newGame_contentWaiting",
         coll: waitingPlayerService.collection,
         query: {
@@ -115,7 +115,7 @@ function choiceSelector(name, property, values, value) {
  */
 function menu(_data, props) {
     return {
-        type: "widget",
+        type: "view",
         name: "menu"
     }
 }

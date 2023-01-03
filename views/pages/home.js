@@ -14,7 +14,7 @@ function content(_data, _props) {
             maxWidth: 600
         },
         child: {
-            type: "widget",
+            type: "view",
             name: "home_filters",
             coll: filterService.collection,
             query: {
@@ -29,7 +29,7 @@ function filters(filters, _props) {
     // TODO: Display filters
     // TODO: filter the query with the filters
     return {
-        type: "widget",
+        type: "view",
         name: "gameList",
         coll: gameService.collection,
         query: {
@@ -51,7 +51,7 @@ function filters(filters, _props) {
  */
 function menu(_data, _props) {
     return {
-        type: "widget",
+        type: "view",
         name: "menu",
         props: {
             mainAction: {

@@ -88,7 +88,7 @@ function gameList(games, props) {
             ...games
                 .map(game => {
                     return {
-                        type: "widget",
+                        type: "view",
                         name: "gameCard",
                         coll: playerService.collection,
                         query: {
@@ -115,6 +115,7 @@ function getProperTime(time) {
  * @returns 
  */
 function gameCard(players, props) {
+    if (players.length!=1) throw new Error(`Players result is not correct: ${players}`);
     const currentPlayer = players[0];
     var difficulty = props.game.difficulty;
     var finished = (props.game.finished) ? "Finished" : "Continue game";

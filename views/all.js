@@ -1,5 +1,5 @@
 const navigationService = require('../services/navigationService.js');
-const widgets = {
+const views = {
   main,
   app: require('./app'),
   ...require("./components/all.js"),
@@ -7,12 +7,12 @@ const widgets = {
   ...require("./modals/all.js"),
 };
 
-module.exports = widgets;
+module.exports = views;
 
 
 function main() {
   return {
-    type: "widget",
+    type: "view",
     name: "app",
     coll: navigationService.collection,
     query: {
