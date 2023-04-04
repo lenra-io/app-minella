@@ -1,3 +1,4 @@
+const { View } = require('@lenra/components');
 const navigationService = require('../services/navigationService.js');
 const views = {
   main,
@@ -11,12 +12,8 @@ module.exports = views;
 
 
 function main() {
-  return {
-    type: "view",
-    name: "app",
-    coll: navigationService.collection,
-    query: {
-      "user": "@me"
-    }
-  };
+  return View("app", {
+    "user": "@me"
+  })
+    .data(navigationService.collection,);
 }

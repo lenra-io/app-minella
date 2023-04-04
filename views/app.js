@@ -1,5 +1,6 @@
 'use strict'
 
+const { Text } = require('@lenra/components');
 const ui = require('./utils/ui.js')
 
 /**
@@ -10,10 +11,7 @@ const ui = require('./utils/ui.js')
 module.exports = (navigations, _props) => {
   const navigation = navigations[0];
   if (!navigation) {
-    return {
-      type: "text",
-      value: "Loading"
-    }
+    return Text("Loading");
   }
   let app = {
     type: "flex",

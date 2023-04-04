@@ -4,22 +4,26 @@
 
 "use strict"
 
-const fs = require('fs');
-const express = require('express')
-const app = express()
+const express = require('express');
+const { writeFileSync } = require('fs');
+const app = express();
 
-const listenerHandlers = require('./listeners/all.js');
-const viewHandlers = require('./views/all.js');
-const manifest = {
-    rootView: 'main'
-};
+const manifestHandler = require('./index.js');
+const defaultMaxSize = '100kb'; // body-parser default
 
-const defaultMaxSize = '100kb' // body-parser default
+const rawLimit = process.env.MAX_RAW_SIZE || defaultMaxSize;
+const jsonLimit = process.env.MAX_JSON_SIZE || defaultMaxSize;
+
+let listenerHandlers = null;
+let viewHandlers = null;
+let manifest = null;
+
+const RESOURCE_TYPE = "resource";
+const LISTENER_TYPE = "listener";
+const VIEW_TYPE = "view";
+const MANIFEST_TYPE = "manifest";
 
 app.disable('x-powered-by');
-
-const rawLimit = process.env.MAX_RAW_SIZE || defaultMaxSize
-const jsonLimit = process.env.MAX_JSON_SIZE || defaultMaxSize
 
 app.use(function addDefaultContentType(req, res, next) {
     // When no content-type is given, the body element is set to
@@ -39,16 +43,40 @@ if (process.env.RAW_BODY === 'true') {
     app.use(express.urlencoded({ extended: true }));
 }
 
-const middleware = async (req, res) => {
-    // Checking whether middleware received a Resource or Action request
+const get_req_type = (req) => {
+    if (req.method !== "POST") return "none";
     if (req.body.resource) {
-        handleAppResource(req, res);
+        return RESOURCE_TYPE;
     } else if (req.body.action) {
-        handleAppListener(req, res);
+        return LISTENER_TYPE;
     } else if (req.body.view) {
-        handleAppView(req, res);
+        return VIEW_TYPE;
     } else {
-        handleAppManifest(req, res);
+        return MANIFEST_TYPE;
+    }
+}
+
+const middleware = async (req, res) => {
+    switch (get_req_type(req)) {
+        case RESOURCE_TYPE:
+            handleAppResource(req, res);
+            break;
+
+        case LISTENER_TYPE:
+            handleAppListener(req, res);
+            break;
+
+        case VIEW_TYPE:
+            handleAppView(req, res);
+            break;
+
+        case MANIFEST_TYPE:
+            handleAppManifest(req, res);
+            break;
+
+        default:
+            throw new Error("Middleware type unknown.");
+
     }
 };
 
@@ -63,31 +91,47 @@ function handleAppResource(req, res) {
     }
 }
 
+async function initManifest() {
+    if (manifest == null) {
+        let tempManifest = await manifestHandler();
+        viewHandlers = tempManifest.views;
+        listenerHandlers = tempManifest.listeners || {};
+        viewHandlers = tempManifest.views;
+        listenerHandlers = tempManifest.listeners || {};
+        manifest = {
+            rootView: tempManifest.rootView
+        };
+    }
+    return Promise.resolve(manifest);
+}
+
 async function handleAppManifest(req, res) {
-    res.status(200).json({ manifest: manifest });
+
+
+    return initManifest().then(manifest => {
+
+        res.status(200).json({ manifest: manifest });
+    })
+        .catch(err => {
+            const err_string = err.toString ? err.toString() : err;
+            console.error("handleAppManifest:", err_string);
+            res.status(500).send(err_string);
+        });
 }
 
 async function handleAppView(req, res) {
-
     let { view, data, props } = req.body;
 
     if (Object.keys(viewHandlers).includes(view)) {
-        let possibleFutureRes;
-        try {
-            possibleFutureRes = Promise.resolve(viewHandlers[view](data, props));
-        }
-        catch (e) {
-            possibleFutureRes = Promise.reject(e);
-        }
+        let possibleFutureRes = viewHandlers[view](data, props)
 
-        return possibleFutureRes
+        return Promise.resolve(possibleFutureRes)
             .then(view => {
-
-                res.status(200).json({ view: view });
+                res.status(200).json(view);
             })
             .catch(err => {
                 const err_string = err.toString ? err.toString() : err;
-                console.error(`handleAppView for view ${view}\ndata: `, data, '\nprops: ', props, '\nerror: ', err.stack || err_string);
+                console.error('handleAppView:', err_string);
                 res.status(500).send(err_string);
             });
     } else {
@@ -120,7 +164,7 @@ async function handleAppListener(req, res) {
             })
             .catch(err => {
                 const err_string = err.toString ? err.toString() : err;
-                console.error(`handleAppListener for action ${action}\nprops: `, props, '\nevent: ', event, '\nerror: ', err.stack || err_string);
+                console.error('handleAppAction:', err_string);
                 res.status(500).send(err_string);
             });
     } else {
@@ -134,6 +178,11 @@ app.post('/*', middleware);
 
 const port = process.env.http_port || 3000;
 
-app.listen(port, () => {
-    console.log(`node listening on port: ${port}`);
+initManifest().then(() => {
+    app.listen(port, () => {
+        writeFileSync("/tmp/.lock", "\n");
+        console.log(`App listening on port: ${port}`)
+    });
+}).catch(err => {
+    console.error(err);
 });
