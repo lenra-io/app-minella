@@ -10,9 +10,7 @@ const ui = require('./utils/ui.js')
  */
 module.exports = (navigations, _props) => {
   const navigation = navigations[0];
-  if (!navigation) {
-    return Text("Loading");
-  }
+  if (!navigation) return Text("Loading");
   let app = {
     type: "flex",
     direction: "vertical",

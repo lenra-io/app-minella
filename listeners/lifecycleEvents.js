@@ -17,7 +17,7 @@ function onUserQuit(props, event, api) {
 }
 
 function onSessionStart(props, event, api) {
-    return navigationService.home(api);
+    // return navigationService.home(api);
 }
 
 function onSessionStop(props, event, api) {
