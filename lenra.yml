@@ -1,26 +1,34 @@
-componentsApi: "1-beta"
+componentsApi: "1.0"
 generator:
   dofigen:
-    from: "bitnami/node:16"
+    from: "docker.io/bitnami/node:16"
     workdir: /app
     root:
-      run:
-      - chown -R 1000 /app
+      script:
+        - chown -R 1000 /app
     adds:
-    - .
-    run:
-    - npm i --omit=dev
-    ports:
-    - 3000
+      - .
+    script:
+      - npm i --omit=dev
     cmd:
       - node
       - server.js
+    ports:
+      - 3000
+    envs:
+      suppress_lock: "true"
+    healthcheck:
+      cmd: curl --fail http://localhost:8080/_/health
+      start: 3s
+      interval: 3s
+      timeout: 1s
     ignores:
-    - "**"
-    - "!/*.json"
-    - "!/server.js"
-    - "!/listeners/"
-    - "!/views/"
-    - "!/classes/"
-    - "!/services/"
-    - "!/resources/"
+      - "**"
+      - "!/*.json"
+      - "!/server.js"
+      - "!/index.js"
+      - "!/listeners/"
+      - "!/resources/"
+      - "!/classes/"
+      - "!/services/"
+      - "!/views/"
