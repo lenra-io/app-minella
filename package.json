@@ -3,13 +3,21 @@
   "version": "1.0.0",
   "description": "Minella is a minesweeper application with multiple game modes and difficulty levels",
   "main": "server.js",
+  "type": "module",
   "scripts": {
+    "start": "app-lenra",
+    "index": "app-lenra index",
     "test": "echo \"Error: no test specified\" && exit 0"
   },
-  "keywords": ["game", "lenra", "minesweeper"],
+  "keywords": [
+    "game",
+    "lenra",
+    "minesweeper"
+  ],
   "author": "Lenra",
   "license": "MIT",
   "dependencies": {
+    "@lenra/app-server": "^1.0.0-beta.4",
     "@lenra/components": "^1.0.0-beta.4",
     "axios": "^0.27.1",
     "express": "^4.18.1",
